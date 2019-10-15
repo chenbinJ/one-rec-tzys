@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.chenbin.SvrManagerMapper">
+    <resultMap id="svrList" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Service">
+        <result column="service_id" property="serviceId"></result>
+        <result column="service_name" property="serviceName"></result>
+        <result column="service_type" property="serviceType"></result>
+        <result column="classification" property="classification"></result>
+        <result column="service_title" property="serviceTitle"></result>
+        <result column="service_code" property="serviceCode"></result>
+        <result column="service_node" property="serviceNode"></result>
+        <result column="position_service_show_setting" property="positionServiceShowSetting"></result>
+        <result column="service_data_to" property="serviceDataTo"></result>
+        <result column="create_by" property="createBy"></result>
+        <result column="status" property="status"></result>
+        <result column="service_data_to" property="serviceDataTo"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="ext1" property="ext1"></result>
+        <result column="ext2" property="ext2"></result>
+    </resultMap>
+    <select id="selectSvr" resultMap="svrList">
+      select service_id,service_name,service_type,
+             service_title,service_code,service_node,
+             create_by,ifnull(status,'可用') status
+      from sj_service
+      <where>
+          <if test="searchParam != null and searchParam!=''">
+              and (service_name like concat('%',#{searchParam},'%') or
+              service_title like concat('%',#{searchParam},'%') or
+              service_code = #{searchParam} or
+              create_by = #{searchParam} or
+              ifnull(status,'可用') = #{searchParam})
+          </if>
+          <if test="status !=null and status!=''">
+              and ifnull(status,'可用') = #{status}
+          </if>
+      </where>
+    </select>
+
+    <select id="selectSvrById" parameterType="java.lang.String" resultMap="svrList">
+        select * from sj_service where service_id = #{svrId}
+    </select>
+    <select id="selectCountOfSvrCode" parameterType="java.lang.String" resultType="int">
+        select count(*) from sj_service where service_code = #{svrCode}
+    </select>
+    <select id="selectSvrByCode" parameterType="java.lang.String" resultMap="svrList">
+        select * from sj_service where service_code = #{svrCode}
+    </select>
+    <insert id="insertSvr" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Service">
+        insert into sj_service(service_id,service_name,service_type,classification,service_title,service_data_to,service_code,service_node,position_service_show_setting,create_by,create_time,status,ext1,ext2) values(
+          #{serviceId},#{serviceName,jdbcType=VARCHAR},#{serviceType,jdbcType=VARCHAR},#{classification,jdbcType=VARCHAR},#{serviceTitle,jdbcType=VARCHAR},
+          #{serviceDataTo,jdbcType=VARCHAR},#{serviceCode,jdbcType=VARCHAR},#{serviceNode,jdbcType=VARCHAR},#{positionServiceShowSetting,jdbcType=VARCHAR},#{createBy,jdbcType=VARCHAR},
+          str_to_date(#{createTime}, '%Y-%m-%d %H:%i:%s'),#{status,jdbcType=VARCHAR},#{ext1,jdbcType=VARCHAR},#{ext2,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateSvr" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Service">
+      update sj_service set
+        service_name=#{serviceName},service_type=#{serviceType},classification=#{classification,jdbcType=VARCHAR},service_title=#{serviceTitle},
+        service_data_to=#{serviceDataTo},service_code=#{serviceCode},service_node=#{serviceNode,jdbcType=VARCHAR},position_service_show_setting=#{positionServiceShowSetting,jdbcType=VARCHAR},
+        ext1=#{ext1,jdbcType=VARCHAR},ext2=#{ext2,jdbcType=VARCHAR}
+      where service_id=#{serviceId}
+    </update>
+
+    <!-- 废弃该服务 -->
+    <update id="updateSvrStatus" parameterType="java.lang.String">
+        update sj_service set status = #{status,jdbcType=VARCHAR} where service_id=#{svrId}
+    </update>
+
+    <!-- 删除服务及相关接口权限 -->
+    <delete id="deleteSvrById" parameterType="java.lang.String">
+        delete from sj_service where service_id = #{svrId}
+    </delete>
+    <delete id="deleteSvrIntfByParam">
+        delete from sj_power_service_interface
+        <where>
+            <if test="powerId!=null and powerId!=''">
+                and power_id = #{powerId}
+            </if>
+            <if test="svrId!=null and svrId!=''">
+                and service_id = #{svrId}
+            </if>
+            <if test="intfId!=null and intfId!=''">
+                and interface_id = #{intfId}
+            </if>
+            or 1 =0
+        </where>
+    </delete>
+
+    <resultMap id="svrIntfs" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Service_Interface"></resultMap>
+    <select id="selectSvrIntf" resultMap="svrIntfs">
+        select
+        power_id,power_title,power_node,service_id,
+        interface_id,data_code,create_by,create_time,
+        enable_time,ifnull(status,'可用') status,ext1,ext2 from sj_power_service_interface
+        <where>
+          service_id = #{svrId}
+          <if test="searchParam!=null and searchParam!=''">
+              and power_title like concat('%',#{searchParam},'%')
+          </if>
+        </where>
+    </select>
+    <select id="selectSvrIntfById" parameterType="java.lang.String" resultMap="svrIntfs">
+        select power_id,power_title,power_node,service_id,
+         interface_id,data_code,create_by,create_time,
+         enable_time,ifnull(status,'可用') status,ext1,ext2 from sj_power_service_interface
+        where power_id = #{powerId}
+    </select>
+
+    <insert id="insertSvrIntf" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Service_Interface">
+        insert into sj_power_service_interface (
+            power_id,power_title,power_node,service_id,
+            interface_id,data_code,create_by,create_time,
+            <if test="enableTime!=null and enableTime!=''">
+              enable_time,
+            </if>
+            status,ext1,ext2
+        )values(
+            #{powerId},#{powerTitle,jdbcType=VARCHAR},#{powerNode,jdbcType=VARCHAR},#{serviceId},
+            #{interfaceId,jdbcType=VARCHAR},#{dataCode,jdbcType=VARCHAR},#{createBy,jdbcType=VARCHAR},
+            str_to_date(#{createTime}, '%Y-%m-%d %H:%i:%s'),
+            <if test="enableTime!=null and enableTime!=''">
+                str_to_date(#{enableTime}, '%Y-%m-%d %H:%i:%s'),
+            </if>
+            #{status,jdbcType=VARCHAR},#{ext1,jdbcType=VARCHAR},#{ext2,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateSvrIntf" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Service_Interface">
+        update sj_power_service_interface
+        set
+          power_title = #{powerTitle,jdbcType=VARCHAR},
+          power_node = #{powerNode,jdbcType=VARCHAR},
+          interface_id = #{interfaceId},
+          data_code = #{dataCode,jdbcType=VARCHAR},
+          <if test="enableTime!=null and enableTime!=''">
+            enable_time = str_to_date(#{enableTime}, '%Y-%m-%d %H:%i:%s'),
+          </if>
+          status = #{status,jdbcType=VARCHAR},
+          ext1 = #{ext1,jdbcType=VARCHAR},
+          ext2 = #{ext2,jdbcType=VARCHAR}
+        where power_id = #{powerId}
+    </update>
+
+    <select id="selectCountOfSvrIntfSame" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Service_Interface" resultType="int">
+        select count(*) from sj_power_service_interface where service_id = #{serviceId} and interface_id = #{interfaceId}
+    </select>
+
+    <resultMap id="sserv" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Service_Interface">
+        <result column="power_id" property="powerId"></result>
+        <result column="power_title" property="powerTitle"></result>
+        <result column="power_node" property="powerNode"></result>
+        <result column="data_code" property="dataCode"></result>
+        <result column="ext1" property="ext1"></result>
+        <result column="ext2" property="ext2"></result>
+        <association property="interfacer" javaType="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface">
+            <result column="intfId" property="interfaceId"></result>
+            <result column="intfCode" property="interfaceCode"></result>
+            <result column="intfName" property="interfaceName"></result>
+            <result column="intfURL" property="interfaceURL"></result>
+            <result column="intfReqMethod" property="reqMethod"></result>
+            <result column="intfUse" property="interfaceUse"></result>
+            <result column="intfProUnit" property="provideUnit"></result>
+            <result column="intfExt1" property="ext1"></result>
+            <result column="intfExt2" property="ext2"></result>
+            <collection property="paramVoList" ofType="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface_Params">
+                <result column="param_id" property="paramId"></result>
+                <result column="param_code" property="paramCode"></result>
+                <result column="param_name" property="paramName"></result>
+                <result column="param_type" property="paramType"></result>
+                <result column="order_number" property="orderNumber"></result>
+                <result column="isFolder" property="isFolder"></result>
+                <result column="pExt1" property="ext1"></result>
+                <result column="pExt2" property="ext2"></result>
+            </collection>
+        </association>
+    </resultMap>
+    <select id="selectSvrIntfInfoById" parameterType="java.lang.String" resultMap="sserv">
+        SELECT
+        svrIntf.power_id,
+        svrIntf.power_title,
+        svrIntf.power_node,
+        svrIntf.data_code,
+        svrIntf.ext1,
+        svrIntf.ext2,
+        intf.interface_id intfId,
+        intf.interface_code intfCode,
+        intf.interface_name intfName,
+        intf.interface_url intfURL,
+        intf.req_method intfReqMethod,
+        intf.isRecord isRecord,
+        intf.interface_use intfUse,
+        intf.provide_unit intfProUnit,
+        intf.ext1 intfExt1,
+        intf.ext2 intfExt2,
+        param.param_id,
+        param.param_code,
+        param.param_name,
+        param.param_type,
+        param.order_number,
+        param.isFolder,
+        param.ext1 pExt1,
+        param.ext2 pExt2
+        FROM
+        sj_power_service_interface svrIntf
+        LEFT JOIN sj_interface intf ON svrIntf.interface_id = intf.interface_id
+        LEFT JOIN sj_interface_params param ON intf.interface_id = param.interface_id
+        WHERE
+        svrIntf.service_id = #{serviceId}
+        AND ifnull(svrIntf.`status`, '可用') = '可用'
+        AND (
+        svrIntf.enable_time IS NULL
+        OR <![CDATA[ svrIntf.enable_time < SYSDATE() ]]>
+        )
+        AND ifnull(intf.`status`, '可用') = '可用'
+        AND ifnull(param.`status`, '可用') = '可用'
+    </select>
+
+    <select id="selectServiceDataToByServiceCode" parameterType="java.lang.String" resultType="java.lang.String">
+        select service_data_to from sj_service where service_code = #{serviceCode}
+    </select>
+    <select id="selectCountOfSvrIntfPower" resultType="int">
+        select
+          count(*)
+        from sj_power_service_interface svrIntf
+          inner join sj_service svr
+         on svrIntf.service_id = svr.service_id
+          inner join sj_interface intf
+         on svrIntf.interface_id = intf.interface_id
+        where svrIntf.interface_id = #{intfId}
+          and svr.service_code = #{svrCode}
+          and ifnull(svr.status,'可用') = '可用'
+          and ifnull(intf.status,'可用') = '可用'
+          and ifnull(svrIntf.status,'可用') = '可用'
+          and (
+            svrIntf.enable_time IS NULL
+            OR <![CDATA[ svrIntf.enable_time < SYSDATE() ]]>
+          )
+    </select>
+    <select id="selectPowerLevelWithPositAndServiceCode" resultType="java.lang.String">
+        select
+          ifnull(t1.permission_level,'ReadOnly') permission_level
+        from sj_power_service_position t1
+        inner join sj_service t2
+          on t1.service_id = t2.service_id
+        where
+          t1.position_id = #{positionId}
+          and t2.service_code = #{serviceCode}
+          and ifnull(t1.status,'可用')='可用'
+          and (
+            t1.enable_time IS NULL
+            OR <![CDATA[ t1.enable_time < SYSDATE() ]]>
+          )
+          and ifnull(t2.status,'可用')='可用'
+    </select>
+
+    <select id="selectSvrIntfBySvrCodeAndIntfId" resultMap="svrIntfs">
+        select
+          svrIntf.*
+        from sj_power_service_interface svrIntf
+          inner join sj_service svr
+         on svrIntf.service_id = svr.service_id
+          inner join sj_interface intf
+         on svrIntf.interface_id = intf.interface_id
+        where svrIntf.interface_id = #{intfId}
+          and svr.service_code = #{svrCode}
+          and ifnull(svr.status,'可用') = '可用'
+          and ifnull(intf.status,'可用') = '可用'
+          and ifnull(svrIntf.status,'可用') = '可用'
+          and (
+            svrIntf.enable_time IS NULL
+            OR <![CDATA[ svrIntf.enable_time < SYSDATE() ]]>
+          )
+    </select>
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ztgeo.general.mapper.chenbin.SJSpacielPowerMapper">
+    <select id="selectPowerByPositionId" parameterType="java.lang.String" resultType="com.ztgeo.general.entity.service_data.pub_data.SJ_Spaciel_Position_Power">
+        select * from sj_spaciel_position_power where position_id = #{positionId}
+    </select>
+
+    <insert id="insertPower" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Spaciel_Position_Power">
+        insert into sj_spaciel_position_power(power_id,position_id,ext) values (#{powerId},#{positionId},#{ext,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="deletePower" parameterType="java.lang.String">
+        delete from sj_spaciel_position_power where position_id = #{positionId}
+    </delete>
+</mapper>

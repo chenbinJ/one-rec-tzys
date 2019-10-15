@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.chenbin.IntfManagerMapper">
+    <resultMap id="intfs" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface"></resultMap>
+    <select id="selectIntfsByPage" resultMap="intfs">
+        select * from sj_interface
+        <where>
+          <if test="intfParam!=null and intfParam!=''">
+              and (
+                interface_code like concat('%',#{intfParam},'%') or
+                interface_name like concat('%',#{intfParam},'%') or
+                use_node like concat('%',#{intfParam},'%')
+              )
+          </if>
+          <if test="status!=null and status!=''">
+              and ifnull(status,'可用') = #{status}
+          </if>
+        </where>
+    </select>
+
+    <resultMap id="intf" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface">
+        <result column="interface_id" property="interfaceId"></result>
+        <result column="interface_code" property="interfaceCode"></result>
+        <result column="interface_name" property="interfaceName"></result>
+        <result column="interface_url" property="interfaceURL"></result>
+        <result column="req_method" property="reqMethod"></result>
+        <result column="resp_node" property="respNode"></result>
+        <result column="content_type" property="contentType"></result>
+        <result column="resp_adapter_class" property="respAdapterClass"></result>
+        <result column="interface_use" property="interfaceUse"></result>
+        <result column="use_node" property="useNode"></result>
+        <result column="isRecord" property="isRecord"></result>
+        <result column="provide_unit" property="provideUnit"></result>
+        <result column="create_by" property="createBy"></result>
+        <result column="create_date" property="createDate"></result>
+        <result column="status" property="status"></result>
+        <result column="ext1" property="ext1"></result>
+        <result column="ext2" property="ext2"></result>
+        <collection property="paramVoList" ofType="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface_Params">
+            <result column="param_id" property="paramId"></result>
+            <result column="param_name" property="paramName"></result>
+            <result column="param_code" property="paramCode"></result>
+            <result column="param_type" property="paramType"></result>
+            <result column="isFolder" property="isFolder"></result>
+        </collection>
+    </resultMap>
+    <select id="selectIntfById" parameterType="java.lang.String" resultMap="intf">
+        select
+          t1.*,
+          t2.param_id param_id,
+          t2.param_name param_name,
+          t2.param_code param_code,
+          t2.param_type param_type,
+          t2.isFolder isFolder
+        from sj_interface t1
+        left join sj_interface_params t2
+          on t1.interface_id = t2.interface_id
+        where t1.interface_id = #{intfId}
+          and ifnull(t2.status,'可用') = '可用'
+    </select>
+    <select id="selectAllEnableIntfs" resultMap="intfs">
+        select * from sj_interface where ifnull(status,'可用') = '可用'
+    </select>
+
+    <insert id="insertIntf" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface">
+        insert into sj_interface(
+          interface_id,interface_code,interface_name,
+          interface_url,req_method,req_param_class,resp_node,
+          content_type,resp_adapter_class,interface_use,isRecord,
+          use_node,provide_unit,create_by,create_date,status,ext1,ext2
+        ) values (
+          #{interfaceId},#{interfaceCode,jdbcType=VARCHAR},#{interfaceName,jdbcType=VARCHAR},
+          #{interfaceURL,jdbcType=VARCHAR},#{reqMethod,jdbcType=VARCHAR},#{reqParamClass,jdbcType=VARCHAR},#{respNode,jdbcType=VARCHAR},
+          #{contentType,jdbcType=VARCHAR},#{respAdapterClass,jdbcType=VARCHAR},#{interfaceUse,jdbcType=VARCHAR},#{isRecord,jdbcType=VARCHAR},
+          #{useNode,jdbcType=VARCHAR},#{provideUnit,jdbcType=VARCHAR},#{createBy},str_to_date(#{createDate}, '%Y-%m-%d %H:%i:%s'),#{status,jdbcType=VARCHAR},#{ext1,jdbcType=VARCHAR},#{ext2,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateIntf" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface">
+        update
+          sj_interface
+        set
+          interface_code = #{interfaceCode,jdbcType=VARCHAR},
+          interface_name = #{interfaceName,jdbcType=VARCHAR},
+          interface_url = #{interfaceURL,jdbcType=VARCHAR},
+          req_method = #{reqMethod,jdbcType=VARCHAR},
+          resp_node = #{respNode,jdbcType=VARCHAR},
+          content_type = #{contentType,jdbcType=VARCHAR},
+          resp_adapter_class = #{respAdapterClass,jdbcType=VARCHAR},
+          interface_use = #{interfaceUse,jdbcType=VARCHAR},
+          use_node = #{useNode,jdbcType=VARCHAR},
+          isRecord = #{isRecord,jdbcType=VARCHAR},
+          provide_unit = #{provideUnit,jdbcType=VARCHAR},
+          ext1 = #{ext1,jdbcType=VARCHAR},
+          ext2 = #{ext2,jdbcType=VARCHAR}
+        where interface_id = #{interfaceId}
+    </update>
+
+    <update id="updateReqParam" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface">
+        update
+          sj_interface
+        set
+          req_param_class = #{reqParamClass,jdbcType=VARCHAR}
+        where interface_id = #{interfaceId}
+    </update>
+
+    <update id="updateIntfStatus">
+        update sj_interface set status=#{status,jdbcType=VARCHAR} where interface_id = #{intfId}
+    </update>
+
+    <delete id="deleteIntfById" parameterType="java.lang.String">
+        delete from sj_interface where interface_id = #{intfId}
+    </delete>
+
+
+    <update id="updateIntfParamStatus">
+        update sj_interface_params set status=#{status,jdbcType=VARCHAR}
+        <where>
+            <if test="intfId != null and intfId !=''">
+                and interface_id = #{intfId}
+            </if>
+            <if test="paramId != null and paramId !=''">
+                and param_id = #{paramId}
+            </if>
+            or 1 = 0
+        </where>
+    </update>
+    <delete id="deleteIntfParams">
+        delete from sj_interface_params
+        <where>
+            <if test="intfId != null and intfId !=''">
+                and interface_id = #{intfId}
+            </if>
+            <if test="paramId != null and paramId !=''">
+                and param_id = #{paramId}
+            </if>
+            or 1 = 0
+        </where>
+    </delete>
+    <insert id="insertIntfParam" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface_Params">
+        insert into sj_interface_params(
+          param_id,interface_id,param_code,param_name,param_type,order_number,isFolder,status,ext1,ext2
+        ) values(
+          #{paramId},#{interfaceId},#{paramCode},#{paramName,jdbcType=VARCHAR},#{paramType},
+          #{orderNumber},#{isFolder,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR},#{ext1,jdbcType=VARCHAR},#{ext2,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateIntfParam" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface_Params">
+        update sj_interface_params set
+          param_name = #{paramName,jdbcType=VARCHAR},
+          param_type = #{paramType},
+          isFolder = #{isFolder,jdbcType=VARCHAR},
+          order_number = #{orderNumber},
+          ext1 = #{ext1,jdbcType=VARCHAR},
+          ext2 = #{ext2,jdbcType=VARCHAR}
+        where param_id = #{paramId}
+    </update>
+    <resultMap id="params" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface_Params"></resultMap>
+    <select id="selectParamsByIntfid" parameterType="java.lang.String" resultMap="params">
+      select
+        param_id,interface_id,param_code,
+        param_name,param_type,order_number,isFolder,
+        ifnull(status,'可用') status,ext1,ext2
+      from sj_interface_params
+      where interface_id = #{intfId}
+    </select>
+    <select id="selectSjIntfParamByParamid" parameterType="java.lang.String" resultMap="params">
+        select
+        param_id,interface_id,param_code,
+        param_name,param_type,order_number,isFolder,
+        ifnull(status,'可用') status,ext1,ext2
+      from sj_interface_params
+      where param_id = #{paramId}
+    </select>
+</mapper>

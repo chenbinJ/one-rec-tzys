@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ztgeo.general.mapper.chenbin.EntryBusinessMapper">
+    <select id="selectEntryByLevel" resultType="java.lang.String">
+      SELECT
+	    t1.mapping_name
+      FROM
+	    sj_fjtm t1
+	  <if test="positionId!=null and positionId!=''">
+          LEFT JOIN sj_power_fjtm_position t2 ON t1.entry_id = t2.entry_id
+      </if>
+      WHERE
+	    t1.process_mould_id = #{mId}
+	    <if test="positionId!=null and positionId!=''">
+            and t2.position_id = #{positionId}
+            <if test="powerLevel!=null and powerLevel!=''">
+                and t2.permission_level = #{powerLevel}
+            </if>
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ztgeo.general.mapper.activity.ApproveMapper">
+
+    <resultMap id="BaseResultMap" type="com.ztgeo.general.entity.activity.Approve">
+        <id column="ID" jdbcType="VARCHAR" property="id" />
+        <result column="APPROVE_FK_ID" jdbcType="VARCHAR" property="approveFkId" />
+        <result column="APPROVE_PROCESSINSTANCEID" jdbcType="VARCHAR" property="approveProcessinstanceid" />
+        <result column="APPROVE_TYPE" jdbcType="VARCHAR" property="approveType" />
+        <result column="APPROVE_STATUS" jdbcType="VARCHAR" property="approveStatus" />
+        <result column="APPROVE_PERSON" jdbcType="VARCHAR" property="approvePerson" />
+        <result column="APPROVE_START_TIME"  property="approveStartTime" />
+        <result column="APPROVE_TASK_START_TIME"  property="approveTaskStartTime" />
+        <result column="APPROVE_TASK_WARNING_TIME"  property="approveTaskWarningTime" />
+        <result column="APPROVE_TASK_OVERDUE_TIME"  property="approveTaskOverdueTime" />
+        <result column="APPROVE_TASK_END_TIME"  property="approveTaskEndTime" />
+        <result column="APPROVE_TASK_ID" property="approveTaskId"/>
+        <result column="APPROCE_PARTICIPANT" property="approvePaticipant"/>
+        <result column="APPLY_CREATE_DAPARTMENT" property="applyDepartment"/>
+        <result column="APPROVE_STATE" property="approveState"/>
+        <result column="attr1" jdbcType="VARCHAR" property="attr1" />
+        <result column="attr2" jdbcType="VARCHAR" property="attr2" />
+        <result column="attr3" jdbcType="VARCHAR" property="attr3" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        ID, APPROVE_FK_ID, APPROVE_PROCESSINSTANCEID, APPROVE_TYPE, APPROVE_STATUS, APPROVE_PERSON,APPROVE_TASK_ID,APPLY_CREATE_DAPARTMENT,
+         APPROVE_TASK_START_TIME, APPROVE_TASK_WARNING_TIME, APPROVE_TASK_OVERDUE_TIME,APPROCE_PARTICIPANT,
+        APPROVE_STATE,APPROVE_TASK_END_TIME, attr1, attr2, attr3
+    </sql>
+
+    <select id="selectByUserDb" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from act_approve
+        where APPROVE_PERSON = #{userName}
+        and APPROVE_TASK_END_TIME is  null
+        <if test="approve.approveStatus!=null and approve.approveStatus!=''">
+            and APPROVE_STATUS = #{approve.approveStatus}
+        </if>
+        <if test="approve.approveProcessinstanceid != null and approve.approveProcessinstanceid != ''">
+            and APPROVE_PROCESSINSTANCEID like concat('%',#{approve.approveProcessinstanceid},'%')
+        </if>
+        <if test="approve.approvePerson != null and approve.approvePerson != ''">
+            and APPROVE_PERSON like concat('%',#{approve.approvePerson},'%')
+        </if>
+        <if test="approve.approveType != null and approve.approveType != ''">
+            and APPROVE_TYPE like concat('%',#{approve.approveType},'%')
+        </if>
+        order by APPROVE_TASK_START_TIME desc
+    </select>
+
+
+
+    <select id="selectApproveByYwcOrName" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from act_approve
+        where APPROVE_PERSON = #{name} and APPROVE_PROCESSINSTANCEID = #{processId}
+              and APPROVE_TASK_END_TIME is not  null
+        order  by APPROVE_TASK_END_TIME desc
+    </select>
+
+    <select id="getUnfinishedProcess" resultMap="BaseResultMap">
+        select approve.* from act_approve approve
+        WHERE APPROVE_PROCESSINSTANCEID in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND approve.APPROVE_STATUS != #{approveStatus}
+        AND approve.APPROVE_PERSON = #{username}
+        <if test="approveType != null and approveType != ''">
+            and APPROVE_TYPE like concat('%',#{approveType},'%')
+        </if>
+        ORDER BY approve.APPROVE_TASK_END_TIME DESC
+    </select>
+
+    <!-- 仅适用于高于5.7版本的MySql-->
+    <select id="findCompletedByNotFinished" resultMap="BaseResultMap">
+        select * from (
+	        select   act.* from act_approve act
+            where act.APPROVE_PERSON=#{username} and act.APPROVE_TASK_END_TIME is not NULL
+            ORDER BY act.APPROVE_TASK_END_TIME desc
+           limit 999999
+        ) a
+      GROUP BY a.approve_processinstanceid
+    </select>
+
+    <select id="findHangUpFlow" resultMap="BaseResultMap">
+        select act.* from  act_approve act
+        where act.APPROVE_STATE=2
+        <if test="username != null and username != ''">
+            and  act.APPROVE_PERSON = #{username}
+        </if>
+        <if test="approveType != null and approveType != ''">
+            and APPROVE_TYPE like concat('%',#{approveType},'%')
+        </if>
+    </select>
+
+    <select id="getApproveByPersonOrFkId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from act_approve
+        where APPROVE_FK_ID = #{approveFkId} and  APPROVE_PERSON = #{username}
+        and  APPROVE_TASK_END_TIME is  null
+    </select>
+
+
+    <select id="findApproveByTask" resultMap="BaseResultMap">
+        select * from act_approve act
+        where act.APPROVE_PERSON = #{username} and act.APPROVE_TASK_ID = #{taskId}
+    </select>
+
+
+    <select id="getApproveByApproveFkId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+         from act_approve act
+        where APPROVE_FK_ID = #{approveFkId}
+    </select>
+
+
+    <select id="getApproveByProcessId" resultMap="BaseResultMap">
+      select
+      <include refid="Base_Column_List"/>
+      from act_approve act
+      where act.APPROVE_PERSON = #{username} and act.APPROVE_PROCESSINSTANCEID = #{processId}
+      and act.APPROVE_TASK_END_TIME is not NULL
+      ORDER BY act.APPROVE_TASK_END_TIME desc
+    </select>
+
+
+    <select id="findCompletedByOwn" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM act_approve
+        WHERE APPROVE_PERSON=#{username}
+        <if test="approve.approveStatus!=null and approve.approveStatus!=''">
+            and APPROVE_STATUS = #{approve.approveStatus}
+        </if>
+        and APPROVE_TASK_END_TIME IS NOT NULL
+    </select>
+
+
+    <select id="selectByIds2" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from act_approve
+        where APPROVE_TASK_ID in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="approve.approveStatus!=null and approve.approveStatus!=''">
+            and APPROVE_STATUS = #{approve.approveStatus}
+        </if>
+        <if test="approve.approveProcessinstanceid != null and approve.approveProcessinstanceid != ''">
+            and APPROVE_PROCESSINSTANCEID like concat('%',#{approve.approveProcessinstanceid},'%')
+        </if>
+        <if test="approve.approvePerson != null and approve.approvePerson != ''">
+            and APPROVE_PERSON like concat('%',#{approve.approvePerson},'%')
+        </if>
+        <if test="approve.approveType != null and approve.approveType != ''">
+            and APPROVE_TYPE like concat('%',#{approve.approveType},'%')
+        </if>
+        order by APPROVE_TASK_START_TIME desc
+    </select>
+
+    <select id="findQdTimeByName" resultMap="BaseResultMap">
+        select act_approve.* from act_approve
+        WHERE APPROVE_PROCESSINSTANCEID=#{processId} and   APPLY_CREATE_DAPARTMENT is  not null
+        and APPROVE_START_TIME IS NOT NULL
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from act_approve
+        where ID = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectByTaskId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from act_approve
+        where APPROVE_TASK_ID = #{taskId,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from act_approve
+        where ID = #{id,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.ztgeo.general.entity.activity.Approve">
+        insert into act_approve (ID, APPROVE_FK_ID, APPROVE_PROCESSINSTANCEID,
+        APPROVE_TYPE, APPROVE_STATUS, APPROVE_PERSON,
+        APPROVE_START_TIME, APPROVE_TASK_START_TIME,
+        APPROVE_TASK_WARNING_TIME, APPROVE_TASK_OVERDUE_TIME,
+        APPROVE_TASK_END_TIME, attr1, attr2,
+        attr3)
+        values (#{id,jdbcType=VARCHAR}, #{approveFkId,jdbcType=VARCHAR}, #{approveProcessinstanceid,jdbcType=VARCHAR},
+        #{approveType,jdbcType=VARCHAR}, #{approveStatus,jdbcType=VARCHAR}, #{approvePerson,jdbcType=VARCHAR},
+        #{approveStartTime,jdbcType=TIMESTAMP}, #{approveTaskStartTime,jdbcType=TIMESTAMP},
+        #{approveTaskWarningTime,jdbcType=TIMESTAMP}, #{approveTaskOverdueTime,jdbcType=TIMESTAMP},
+        #{approveTaskEndTime,jdbcType=TIMESTAMP}, #{attr1,jdbcType=VARCHAR}, #{attr2,jdbcType=VARCHAR},
+        #{attr3,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ztgeo.general.entity.activity.Approve">
+        insert into act_approve
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="approveFkId != null">
+                APPROVE_FK_ID,
+            </if>
+            <if test="approveProcessinstanceid != null">
+                APPROVE_PROCESSINSTANCEID,
+            </if>
+            <if test="approveType != null">
+                APPROVE_TYPE,
+            </if>
+            <if test="approveStatus != null">
+                APPROVE_STATUS,
+            </if>
+            <if test="approvePerson != null">
+                APPROVE_PERSON,
+            </if>
+            <if test="approveStartTime != null">
+                APPROVE_START_TIME,
+            </if>
+            <if test="approveTaskStartTime != null">
+                APPROVE_TASK_START_TIME,
+            </if>
+            <if test="approveTaskWarningTime != null">
+                APPROVE_TASK_WARNING_TIME,
+            </if>
+            <if test="approveTaskOverdueTime != null">
+                APPROVE_TASK_OVERDUE_TIME,
+            </if>
+            <if test="approveTaskEndTime != null">
+                APPROVE_TASK_END_TIME,
+            </if>
+            <if test="attr1 != null">
+                attr1,
+            </if>
+            <if test="attr2 != null">
+                attr2,
+            </if>
+            <if test="attr3 != null">
+                attr3,
+            </if>
+            <if test="approveTaskId != null">
+                APPROVE_TASK_ID,
+            </if>
+            <if test="approvePaticipant != null">
+                APPROCE_PARTICIPANT,
+            </if>
+            <if test="applyDepartment != null">
+                APPLY_CREATE_DAPARTMENT,
+            </if>
+            <if test="approveState != null">
+                APPROVE_STATE
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="approveFkId != null">
+                #{approveFkId,jdbcType=VARCHAR},
+            </if>
+            <if test="approveProcessinstanceid != null">
+                #{approveProcessinstanceid,jdbcType=VARCHAR},
+            </if>
+            <if test="approveType != null">
+                #{approveType,jdbcType=VARCHAR},
+            </if>
+            <if test="approveStatus != null">
+                #{approveStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="approvePerson != null">
+                #{approvePerson,jdbcType=VARCHAR},
+            </if>
+            <if test="approveStartTime != null">
+                #{approveStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="approveTaskStartTime != null">
+                #{approveTaskStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="approveTaskWarningTime != null">
+                #{approveTaskWarningTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="approveTaskOverdueTime != null">
+                #{approveTaskOverdueTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="approveTaskEndTime != null">
+                #{approveTaskEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="attr1 != null">
+                #{attr1,jdbcType=VARCHAR},
+            </if>
+            <if test="attr2 != null">
+                #{attr2,jdbcType=VARCHAR},
+            </if>
+            <if test="attr3 != null">
+                #{attr3,jdbcType=VARCHAR},
+            </if>
+            <if test="approveTaskId != null">
+                #{approveTaskId},
+            </if>
+            <if test="approvePaticipant != null">
+                #{approvePaticipant},
+            </if>
+            <if test="applyDepartment != null">
+                #{applyDepartment},
+            </if>
+            <if test="approveState != null">
+                #{approveState}
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ztgeo.general.entity.activity.Approve">
+        update act_approve
+        <set>
+            <if test="approveFkId != null">
+                APPROVE_FK_ID = #{approveFkId,jdbcType=VARCHAR},
+            </if>
+            <if test="approveProcessinstanceid != null">
+                APPROVE_PROCESSINSTANCEID = #{approveProcessinstanceid,jdbcType=VARCHAR},
+            </if>
+            <if test="approveType != null">
+                APPROVE_TYPE = #{approveType,jdbcType=VARCHAR},
+            </if>
+            <if test="approveStatus != null">
+                APPROVE_STATUS = #{approveStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="approvePerson != null">
+                APPROVE_PERSON = #{approvePerson,jdbcType=VARCHAR},
+            </if>
+            <if test="approveStartTime != null">
+                APPROVE_START_TIME = #{approveStartTime},
+            </if>
+            <if test="approveTaskWarningTime != null">
+                APPROVE_TASK_WARNING_TIME = #{approveTaskWarningTime},
+            </if>
+            <if test="approveTaskOverdueTime != null">
+                APPROVE_TASK_OVERDUE_TIME = #{approveTaskOverdueTime},
+            </if>
+                APPROVE_TASK_END_TIME = #{approveTaskEndTime},
+            <if test="approveState != null">
+                APPROVE_STATE= #{approveState},
+            </if>
+            <if test="attr1 != null">
+                attr1 = #{attr1,jdbcType=VARCHAR},
+            </if>
+            <if test="attr2 != null">
+                attr2 = #{attr2,jdbcType=VARCHAR},
+            </if>
+            <if test="attr3 != null">
+                attr3 = #{attr3,jdbcType=VARCHAR},
+            </if>
+            <if test="approveTaskId != null">
+                APPROVE_TASK_ID=#{approveTaskId},
+            </if>
+            <if test="approvePaticipant != null">
+                APPROCE_PARTICIPANT= #{approvePaticipant},
+            </if>
+            <if test="applyDepartment != null">
+                APPLY_CREATE_DAPARTMENT= #{applyDepartment},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+
+
+
+    <update id="updateApproveByTaskId" parameterType="com.ztgeo.general.entity.activity.Approve">
+        update act_approve
+        <set>
+            <if test="approveFkId != null">
+                APPROVE_FK_ID = #{approveFkId,jdbcType=VARCHAR},
+            </if>
+            <if test="approveProcessinstanceid != null">
+                APPROVE_PROCESSINSTANCEID = #{approveProcessinstanceid,jdbcType=VARCHAR},
+            </if>
+            <if test="approveType != null">
+                APPROVE_TYPE = #{approveType,jdbcType=VARCHAR},
+            </if>
+            <if test="approveStatus != null">
+                APPROVE_STATUS = #{approveStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="approvePerson != null">
+                APPROVE_PERSON = #{approvePerson,jdbcType=VARCHAR},
+            </if>
+            <if test="approveStartTime != null">
+                APPROVE_START_TIME = #{approveStartTime},
+            </if>
+            <if test="approveTaskWarningTime != null">
+                APPROVE_TASK_WARNING_TIME = #{approveTaskWarningTime},
+            </if>
+            <if test="approveTaskOverdueTime != null">
+                APPROVE_TASK_OVERDUE_TIME = #{approveTaskOverdueTime},
+            </if>
+        </set>
+        where APPROVE_TASK_ID = #{approveTaskId}
+    </update>
+
+
+
+
+
+
+    <update id="updateByPrimaryKey" parameterType="com.ztgeo.general.entity.activity.Approve">
+        update act_approve
+        set APPROVE_FK_ID = #{approveFkId,jdbcType=VARCHAR},
+        APPROVE_PROCESSINSTANCEID = #{approveProcessinstanceid,jdbcType=VARCHAR},
+        APPROVE_TYPE = #{approveType,jdbcType=VARCHAR},
+        APPROVE_STATUS = #{approveStatus,jdbcType=VARCHAR},
+        APPROVE_PERSON = #{approvePerson,jdbcType=VARCHAR},
+        APPROVE_START_TIME = #{approveStartTime,jdbcType=TIMESTAMP},
+        APPROVE_TASK_START_TIME = #{approveTaskStartTime,jdbcType=TIMESTAMP},
+        APPROVE_TASK_WARNING_TIME = #{approveTaskWarningTime,jdbcType=TIMESTAMP},
+        APPROVE_TASK_OVERDUE_TIME = #{approveTaskOverdueTime,jdbcType=TIMESTAMP},
+        APPROVE_TASK_END_TIME = #{approveTaskEndTime,jdbcType=TIMESTAMP},
+        attr1 = #{attr1,jdbcType=VARCHAR},
+        attr2 = #{attr2,jdbcType=VARCHAR},
+        attr3 = #{attr3,jdbcType=VARCHAR}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

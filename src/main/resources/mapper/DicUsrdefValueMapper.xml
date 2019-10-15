@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ztgeo.general.mapper.DicUsrdefValueMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.ztgeo.general.entity.DicUsrdefValue" id="dicUsrdefValueMap">
+        <result property="id" column="ID"/>
+        <result property="diccode" column="DICCODE"/>
+        <result property="pid" column="PID"/>
+        <result property="sortnum" column="SORTNUM"/>
+        <result property="value1" column="VALUE1"/>
+        <result property="value2" column="VALUE2"/>
+        <result property="value3" column="VALUE3"/>
+        <result property="value4" column="VALUE4"/>
+        <result property="value5" column="VALUE5"/>
+        <result property="value6" column="VALUE6"/>
+        <result property="value7" column="VALUE7"/>
+        <result property="value8" column="VALUE8"/>
+        <result property="value9" column="VALUE9"/>
+        <result property="value10" column="VALUE10"/>
+    </resultMap>
+
+    <select id="getModule" resultMap="dicUsrdefValueMap">
+         select t.* from dic_usrdef_value t inner join dic_main m
+on t.DICCODE = m.diccode where m.diccode =#{dicCode} and m.dicstate = '启用'
+    </select>
+
+
+</mapper>

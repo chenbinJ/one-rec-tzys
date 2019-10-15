@@ -1,0 +1,1311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.chenbin.SJInfoManagerMapper">
+    <select id="selectCountOfSvr" parameterType="java.lang.String" resultType="int">
+      select FORMAT(sum(sm),0) from (
+        select count(*) sm from sj_info_bdcdyxgxx t1 where t1.service_code in (select t2.service_code from sj_service t2 where t2.service_id = #{svrId})
+        union
+        select count(*) sm from sj_info_bdcqlxgxx t3 where t3.service_code in (select t4.service_code from sj_service t4 where t4.service_id = #{svrId})
+        union
+        select count(*) sm from sj_info_dyhtxx t5 where t5.service_code in (select t6.service_code from sj_service t6 where t6.service_id = #{svrId})
+        union
+        select count(*) sm from sj_info_jyhtxx t7 where t7.service_code in (select t8.service_code from sj_service t8 where t8.service_id = #{svrId})
+        union
+        select count(*) sm from sj_info_qsxx t9 where t9.service_code in (select t10.service_code from sj_service t10 where t10.service_id = #{svrId})
+        union
+        select count(*) sm from sj_info_handle_result t11 where t11.service_code in (select t12.service_code from sj_service t12 where t12.service_id = #{svrId})
+      ) as sm_table
+    </select>
+  <resultMap id="sjsq" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Sjsq"></resultMap>
+  <select id="selectSjsqBySjbh" parameterType="java.lang.String" resultMap="sjsq">
+      select * from sj_sjsq where receipt_number = #{sqbh}
+  </select>
+
+  <resultMap id="bdcqlxxs" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Info_Bdcqlxgxx"></resultMap>
+    <select id="selectBdcqlxxs" resultMap="bdcqlxxs">
+  SELECT
+	t1.*
+  FROM
+	sj_info_bdcqlxgxx t1
+  WHERE
+	t1.receipt_number = #{sqbh}
+  AND t1.service_code = #{serviceCode}
+  </select>
+    <select id="selectBdcqlxxsBySqbh" parameterType="java.lang.String" resultMap="bdcqlxxs">
+  SELECT
+	t1.*
+  FROM
+	sj_info_bdcqlxgxx t1
+  WHERE
+	t1.receipt_number = #{sqbh}
+  </select>
+
+  <resultMap id="bdcdyxxs" type="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Bdcdyxgxx"></resultMap>
+  <select id="selectBdcdyxxs" resultMap="bdcdyxxs">
+  SELECT
+	t1.*
+  FROM
+	sj_info_bdcdyxgxx t1
+  WHERE
+	t1.receipt_number = #{sqbh}
+  AND t1.service_code = #{serviceCode}
+  </select>
+    <select id="selectBdcdyxxsBySqbh" parameterType="java.lang.String" resultMap="bdcdyxxs">
+  SELECT
+	t1.*
+  FROM
+	sj_info_bdcdyxgxx t1
+  WHERE
+	t1.receipt_number = #{sqbh}
+  </select>
+
+  <resultMap id="dyhtxxs" type="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Dyhtxx"></resultMap>
+  <select id="selectDyhtxxs" resultMap="dyhtxxs">
+  SELECT
+	t1.*
+  FROM
+	sj_info_dyhtxx t1
+  WHERE
+	t1.receipt_number = #{sqbh}
+  AND t1.service_code = #{serviceCode}
+  </select>
+<select id="selectDyhtxxsBySqbh" parameterType="java.lang.String" resultMap="dyhtxxs">
+    select t1.*
+  FROM
+	sj_info_dyhtxx t1
+  WHERE
+	t1.receipt_number = #{sqbh}
+</select>
+
+  <resultMap id="jyhtxxs" type="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Jyhtxx"></resultMap>
+  <select id="selectJyhtxxs" resultMap="jyhtxxs">
+  SELECT
+	t1.*
+  FROM
+	sj_info_jyhtxx t1
+  WHERE
+	t1.receipt_number = #{sqbh}
+  AND t1.service_code = #{serviceCode}
+  </select>
+    <select id="selectJyhtxxsBySqbh" parameterType="java.lang.String" resultMap="jyhtxxs">
+        SELECT
+	t1.*
+  FROM
+	sj_info_jyhtxx t1
+  WHERE
+	t1.receipt_number = #{sqbh}
+    </select>
+
+  <resultMap id="qsxxs" type="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Qsxx"></resultMap>
+  <select id="selectDsxxs" resultMap="qsxxs">
+  SELECT
+	t1.*
+  FROM
+	sj_info_qsxx t1
+  WHERE
+	t1.receipt_number = #{sqbh}
+  AND t1.service_code = #{serviceCode}
+  </select>
+
+  <resultMap id="handleResults" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Info_Handle_Result"></resultMap>
+  <select id="selectHandleResults" resultMap="handleResults">
+  SELECT
+	t1.*
+  FROM
+	sj_info_handle_result t1
+  WHERE
+	t1.receipt_number = #{sqbh}
+  AND t1.service_code = #{serviceCode}
+  </select>
+
+  <resultMap id="qlrgls" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Qlr_Gl">
+    <result column="relation_id" property="relationId"></result>
+    <result column="info_id" property="infoId"></result>
+    <result column="obligee_id" property="obligeeId"></result>
+    <result column="obligee_name" property="obligeeName"></result>
+    <result column="obligee_type" property="obligeeType"></result>
+    <result column="obligee_order" property="obligeeOrder"></result>
+    <result column="shared_mode" property="sharedMode"></result>
+    <result column="shared_value" property="sharedValue"></result>
+    <result column="info_table_identification" property="infoTableIdentification"></result>
+    <result column="status" property="status"></result>
+    <association property="relatedPerson" javaType="com.ztgeo.general.entity.service_data.pub_data.SJ_Qlr_Info">
+      <result column="qlrid" property="obligeeId"></result>
+      <result column="qlrmc" property="obligeeName"></result>
+      <result column="qlrzjlx" property="obligeeDocumentType"></result>
+      <result column="qlrzjhm" property="obligeeDocumentNumber"></result>
+      <result column="qlrzt" property="status"></result>
+      <result column="ext1" property="ext1"></result>
+      <result column="ext2" property="ext2"></result>
+      <result column="ext3" property="ext3"></result>
+    </association>
+  </resultMap>
+  <select id="selectQlrGlByInfoId" resultMap="qlrgls">
+    SELECT
+	  t1.*, t2.obligee_id qlrid,
+	  t2.obligee_name qlrmc,
+	  t2.obligee_document_type qlrzjlx,
+	  t2.obligee_document_number qlrzjhm,
+	  t2.`status` qlrzt,
+	  t2.ext1,
+	  t2.ext2,
+	  t2.ext3
+    FROM
+	  sj_qlr_gl t1
+    LEFT JOIN sj_qlr_info t2 ON t1.obligee_id = t2.obligee_id
+    WHERE
+	  t1.info_id = #{infoId}
+	  <if test="qlrlx!=null and qlrlx!=''">
+        and t1.obligee_type = #{qlrlx}
+      </if>
+  </select>
+
+  <resultMap id="bdcgls" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Gl"></resultMap>
+  <select id="selectBdcglByInfoId" parameterType="java.lang.String" resultMap="bdcgls">
+    select * from sj_bdc_gl where info_id = #{infoId}
+  </select>
+
+  <resultMap id="fd" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Fw_Info"></resultMap>
+  <select id="selectBdcFDByInfoId" parameterType="java.lang.String" resultMap="fd">
+    select * from sj_bdc_fw_info where house_id = #{houseId}
+  </select>
+
+  <resultMap id="jd" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Zd_Info"></resultMap>
+  <select id="selectBdcJDByInfoId" parameterType="java.lang.String" resultMap="jd">
+    select * from sj_bdc_zd_info where parcel_id = #{landId}
+  </select>
+
+    <select id="selectBdcqlxxBySjbhAndBDCCertNo" resultMap="bdcqlxxs">
+        select * from sj_info_bdcqlxgxx where receipt_number=#{receiptNumber} and immovable_certificate_No=#{immovableCertificateNo} and service_code = #{serviceCode}
+    </select>
+    <select id="selectBdcqlxxBySjbhAndFCCertNo" resultMap="bdcqlxxs">
+        select * from sj_info_bdcqlxgxx where receipt_number=#{receiptNumber} and house_certificate_No = #{houseCertificateNo} and land_certificate_No = #{landCertificateNo}  and service_code = #{serviceCode}
+    </select>
+    <select id="selectBdcdyxxBySjbhAndMortgageNo" resultMap="bdcdyxxs">
+        select * from sj_info_bdcdyxgxx where receipt_number=#{receiptNumber} and mortgage_certificate_No = #{mortgageCertificateNo} and service_code = #{serviceCode}
+    </select>
+    <select id="selectJyhtxxBySqbh" resultMap="jyhtxxs">
+        select * from sj_info_jyhtxx where receipt_number=#{receiptNumber}
+    </select>
+    <select id="selectDyhtxxBySqbh" resultMap="dyhtxxs">
+        select * from sj_info_dyhtxx where receipt_number=#{receiptNumber}
+    </select>
+    <select id="selectQsxxBySqbh" resultMap="qsxxs">
+        select * from sj_info_qsxx where receipt_number=#{receiptNumber} and service_code=#{serviceCode} and xtsphm = #{xtsphm} and nsrsbh=#{nsrsbh}
+    </select>
+    <select id="selectReceiptNumberByRegisterNumber" parameterType="java.lang.String" resultType="java.lang.String">
+        select receipt_number from sj_sjsq where register_number = #{registerNumber}
+    </select>
+
+    <select id="selectCountOfHouse" parameterType="java.lang.String" resultType="int">
+        select count(*) from sj_bdc_fw_info where house_id = #{houseId}
+    </select>
+    <select id="selectCountOfParcel" parameterType="java.lang.String" resultType="int">
+        select count(*) from sj_bdc_zd_info where parcel_id = #{parcelId}
+    </select>
+    <select id="selectCountOfObligee" parameterType="java.lang.String" resultType="int">
+        select count(*) from sj_qlr_info where obligee_id = #{obligeeId}
+    </select>
+
+    <insert id="insertSjsq" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Sjsq">
+      insert into sj_sjsq(
+        receipt_number,
+        business_type,
+        registration_category,
+        registration_subclass,
+        registration_reason,
+        immovable_site,
+        immovable_type,
+        notified_person_name,
+        notified_person_telephone,
+        notified_person_address,
+        immovable_process_identification,
+        platform,
+        immovable_receiving_person,
+        district_code,
+        postscript_information,
+        receipt_man,
+        receipt_time,
+        register_number,
+        status,
+        ext1,
+        ext2,
+        ext3,
+        ext4
+      ) values (
+        #{receiptNumber},
+        #{businessType,jdbcType=VARCHAR},
+        #{registrationCategory,jdbcType=VARCHAR},
+        #{registrationSubclass,jdbcType=VARCHAR},
+        #{registrationReason,jdbcType=VARCHAR},
+        #{immovableSite,jdbcType=VARCHAR},
+        #{immovableType,jdbcType=VARCHAR},
+        #{notifiedPersonName,jdbcType=VARCHAR},
+        #{notifiedPersonTelephone,jdbcType=VARCHAR},
+        #{notifiedPersonAddress,jdbcType=VARCHAR},
+        #{immovableProcessIdentification,jdbcType=VARCHAR},
+        #{platform,jdbcType=VARCHAR},
+        #{immovableReceivingPerson,jdbcType=VARCHAR},
+        #{districtCode,jdbcType=VARCHAR},
+        #{postscriptInformation,jdbcType=VARCHAR},
+        #{receiptMan,jdbcType=VARCHAR},
+        str_to_date(#{receiptTime}, '%Y-%m-%d %H:%i:%s'),
+        #{registerNumber,jdbcType=VARCHAR},
+        #{status,jdbcType=VARCHAR},
+        #{ext1,jdbcType=VARCHAR},
+        #{ext2,jdbcType=VARCHAR},
+        #{ext3,jdbcType=VARCHAR},
+        #{ext4,jdbcType=VARCHAR}
+      )
+    </insert>
+
+    <update id="updateSjsq" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Sjsq">
+      update
+        sj_sjsq
+      set
+        <if test="businessType!=null and businessType!=''">
+		  business_type = #{businessType,jdbcType=VARCHAR},
+        </if>
+        <if test="registrationCategory!=null and registrationCategory!=''">
+		  registration_category = #{registrationCategory,jdbcType=VARCHAR},
+        </if>
+
+        <if test="registrationSubclass!=null and registrationSubclass!=''">
+            registration_subclass = #{registrationSubclass,jdbcType=VARCHAR},
+        </if>
+        <if test="registrationReason!=null and registrationReason!=''">
+            registration_reason = #{registrationReason,jdbcType=VARCHAR},
+        </if>
+        <if test="immovableSite!=null and immovableSite!=''">
+            immovable_site = #{immovableSite,jdbcType=VARCHAR},
+        </if>
+
+        <if test="immovableType!=null and immovableType!=''">
+		  immovable_type = #{immovableType,jdbcType=VARCHAR},
+        </if>
+        <if test="notifiedPersonName!=null and notifiedPersonName!=''">
+		  notified_person_name = #{notifiedPersonName,jdbcType=VARCHAR},
+        </if>
+        <if test="notifiedPersonTelephone!=null and notifiedPersonTelephone!=''">
+		  notified_person_telephone = #{notifiedPersonTelephone,jdbcType=VARCHAR},
+        </if>
+        <if test="notifiedPersonAddress!=null and notifiedPersonAddress!=''">
+		  notified_person_address = #{notifiedPersonAddress,jdbcType=VARCHAR},
+        </if>
+        <if test="immovableProcessIdentification!=null and immovableProcessIdentification!=''">
+		  immovable_process_identification = #{immovableProcessIdentification,jdbcType=VARCHAR},
+        </if>
+        <if test="platform!=null and platform!=''">
+		  platform = #{platform,jdbcType=VARCHAR},
+        </if>
+        <if test="immovableReceivingPerson!=null and immovableReceivingPerson!=''">
+		  immovable_receiving_person = #{immovableReceivingPerson,jdbcType=VARCHAR},
+        </if>
+        <if test="districtCode!=null and districtCode!=''">
+		  district_code = #{districtCode,jdbcType=VARCHAR},
+        </if>
+        <if test="postscriptInformation!=null and postscriptInformation!=''">
+		  postscript_information = #{postscriptInformation,jdbcType=VARCHAR},
+        </if>
+        <if test="receiptMan!=null and receiptMan!=''">
+		  receipt_man = #{receiptMan,jdbcType=VARCHAR},
+        </if>
+        <if test="receiptTime!=null and receiptTime!=''">
+		  receipt_time = str_to_date(#{receiptTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        <if test="registerNumber!=null and registerNumber!=''">
+            register_number = #{registerNumber,jdbcType=VARCHAR},
+        </if>
+        <if test="status!=null and status!=''">
+            status = #{status,jdbcType=VARCHAR},
+        </if>
+		ext1 = #{ext1,jdbcType=VARCHAR},
+		ext2 = #{ext2,jdbcType=VARCHAR},
+		ext3 = #{ext3,jdbcType=VARCHAR},
+		ext4 = #{ext4,jdbcType=VARCHAR}
+	  where
+        receipt_number = #{receiptNumber}
+    </update>
+
+    <insert id="insertBdcqlxx" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Info_Bdcqlxgxx">
+        insert into sj_info_bdcqlxgxx (
+            info_id,
+			receipt_number,
+			acceptance_number,
+			immovable_site,
+			immovable_certificate_No,
+			house_certificate_No,
+			land_certificate_No,
+            water_number,
+            electric_number,
+            gas_number,
+			<if test="registrationDate!=null and registrationDate!=''">
+                registration_date,
+            </if>
+			certificate_type,
+			architectural_area,
+			house_architectural_area,
+			apportionment_architectural_area,
+			house_obtaining_ways,
+			house_obtaining_price,
+			house_planning_purpose,
+			house_valuation_amount,
+			house_type,
+			house_right_type,
+			house_right_nature,
+			land_right_type,
+			land_right_nature,
+        <if test="landUseRightStartingDate!=null and landUseRightStartingDate!=''">
+			land_use_right_starting_date,
+        </if>
+        <if test="landUseRightEndingDate!=null and landUseRightEndingDate!=''">
+			land_use_right_ending_date,
+        </if>
+			land_use_right_owner,
+			land_use_time_limit,
+			land_purpose,
+			common_land_area,
+			single_land_area,
+			share_land_area,
+			building_parcel_area,
+			remarks,
+			service_code,
+			data_json,
+			data_type,
+			provide_unit,
+			data_come_from_mode,
+            preservation_man,
+			insert_time,
+			ext1,
+			ext2,
+			ext3
+        ) values (
+            #{infoId},
+            #{receiptNumber},
+            #{acceptanceNumber,jdbcType=VARCHAR},
+			#{immovableSite,jdbcType=VARCHAR},
+			#{immovableCertificateNo,jdbcType=VARCHAR},
+			#{houseCertificateNo,jdbcType=VARCHAR},
+			#{landCertificateNo,jdbcType=VARCHAR},
+			#{waterNumber,jdbcType=VARCHAR},
+            #{electricNumber,jdbcType=VARCHAR},
+            #{gasNumber,jdbcType=VARCHAR},
+            <if test="registrationDate!=null and registrationDate!=''">
+			  str_to_date(#{registrationDate}, '%Y-%m-%d %H:%i:%s'),
+            </if>
+			#{certificateType,jdbcType=VARCHAR},
+			#{architecturalArea,jdbcType=DECIMAL},
+			#{houseArchitecturalArea,jdbcType=DECIMAL},
+			#{apportionmentArchitecturalArea,jdbcType=DECIMAL},
+			#{houseObtainingWays,jdbcType=VARCHAR},
+			#{houseObtainingPrice,jdbcType=DECIMAL},
+			#{housePlanningPurpose,jdbcType=VARCHAR},
+			#{houseValuationAmount,jdbcType=DECIMAL},
+			#{houseType,jdbcType=VARCHAR},
+			#{houseRightType,jdbcType=VARCHAR},
+			#{houseRightNature,jdbcType=VARCHAR},
+			#{landRightType,jdbcType=VARCHAR},
+			#{landRightNature,jdbcType=VARCHAR},
+			<if test="landUseRightStartingDate!=null and landUseRightStartingDate!=''">
+                str_to_date(#{landUseRightStartingDate}, '%Y-%m-%d'),
+            </if>
+            <if test="landUseRightEndingDate!=null and landUseRightEndingDate!=''">
+                str_to_date(#{landUseRightEndingDate}, '%Y-%m-%d'),
+            </if>
+			#{landUseRightOwner,jdbcType=VARCHAR},
+			#{landUseTimeLimit,jdbcType=VARCHAR},
+			#{landPurpose,jdbcType=VARCHAR},
+			#{commonLandArea,jdbcType=DECIMAL},
+			#{singleLandArea,jdbcType=DECIMAL},
+			#{shareLandArea,jdbcType=DECIMAL},
+			#{buildingParcelArea,jdbcType=DECIMAL},
+			#{remarks,jdbcType=VARCHAR},
+			#{serviceCode,jdbcType=VARCHAR},
+			#{dataJson,jdbcType=VARCHAR},
+			#{dataType,jdbcType=VARCHAR},
+			#{provideUnit,jdbcType=VARCHAR},
+			#{dataComeFromMode,jdbcType=VARCHAR},
+			#{preservationMan,jdbcType=VARCHAR},
+            str_to_date(#{insertTime}, '%Y-%m-%d %H:%i:%s'),
+			#{ext1,jdbcType=VARCHAR},
+			#{ext2,jdbcType=VARCHAR},
+			#{ext3,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateBdcqlxx" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Info_Bdcqlxgxx">
+        update
+          sj_info_bdcqlxgxx
+        set
+        receipt_number = #{receiptNumber},
+        acceptance_number = #{acceptanceNumber,jdbcType=VARCHAR},
+        immovable_site = #{immovableSite,jdbcType=VARCHAR},
+        immovable_certificate_No = #{immovableCertificateNo,jdbcType=VARCHAR},
+        house_certificate_No = #{houseCertificateNo,jdbcType=VARCHAR},
+        land_certificate_No = #{landCertificateNo,jdbcType=VARCHAR},
+        water_number = #{waterNumber,jdbcType=VARCHAR},
+        electric_number = #{electricNumber,jdbcType=VARCHAR},
+        gas_number = #{gasNumber,jdbcType=VARCHAR},
+        <if test="registrationDate!=null and registrationDate!=''">
+            registration_date = str_to_date(#{registrationDate}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        certificate_type = #{certificateType,jdbcType=VARCHAR},
+        architectural_area = #{architecturalArea,jdbcType=DECIMAL},
+        house_architectural_area = #{houseArchitecturalArea,jdbcType=DECIMAL},
+        apportionment_architectural_area = #{apportionmentArchitecturalArea,jdbcType=DECIMAL},
+        house_obtaining_ways = #{houseObtainingWays,jdbcType=VARCHAR},
+        house_obtaining_price = #{houseObtainingPrice,jdbcType=DECIMAL},
+        house_planning_purpose = #{housePlanningPurpose,jdbcType=VARCHAR},
+        house_valuation_amount = #{houseValuationAmount,jdbcType=DECIMAL},
+        house_type = #{houseType,jdbcType=VARCHAR},
+        house_right_type = #{houseRightType,jdbcType=VARCHAR},
+        house_right_nature = #{houseRightNature,jdbcType=VARCHAR},
+        land_right_type = #{landRightType,jdbcType=VARCHAR},
+        land_right_nature = #{landRightNature,jdbcType=VARCHAR},
+        <if test="landUseRightStartingDate!=null and landUseRightStartingDate!=''">
+            land_use_right_starting_date = str_to_date(#{landUseRightStartingDate}, '%Y-%m-%d'),
+        </if>
+        <if test="landUseRightEndingDate!=null and landUseRightEndingDate!=''">
+            land_use_right_ending_date = str_to_date(#{landUseRightEndingDate}, '%Y-%m-%d'),
+        </if>
+        land_use_right_owner = #{landUseRightOwner,jdbcType=VARCHAR},
+        land_use_time_limit = #{landUseTimeLimit,jdbcType=VARCHAR},
+        land_purpose = #{landPurpose,jdbcType=VARCHAR},
+        common_land_area = #{commonLandArea,jdbcType=DECIMAL},
+        single_land_area = #{singleLandArea,jdbcType=DECIMAL},
+        share_land_area = #{shareLandArea,jdbcType=DECIMAL},
+        building_parcel_area = #{buildingParcelArea,jdbcType=DECIMAL},
+        remarks = #{remarks,jdbcType=VARCHAR},
+        service_code = #{serviceCode,jdbcType=VARCHAR},
+        data_json = #{dataJson,jdbcType=VARCHAR},
+        data_type = #{dataType,jdbcType=VARCHAR},
+        provide_unit = #{provideUnit,jdbcType=VARCHAR},
+        data_come_from_mode = #{dataComeFromMode,jdbcType=VARCHAR},
+        preservation_man = #{preservationMan,jdbcType=VARCHAR},
+        ext1 = #{ext1,jdbcType=VARCHAR},
+        ext2 = #{ext2,jdbcType=VARCHAR},
+        ext3 = #{ext3,jdbcType=VARCHAR}
+      where info_id = #{infoId}
+    </update>
+    <insert id="insertBdcdyxx" parameterType="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Bdcdyxgxx">
+        insert into sj_info_bdcdyxgxx (
+            info_id,
+			receipt_number,
+			acceptance_number,
+			immovable_site,
+			mortgage_certificate_No,
+        <if test="registrationDate!=null and registrationDate!=''">
+			registration_date,
+        </if>
+			mortgage_mode,
+			mortgage_area,
+			credit_amount,
+			mortgage_amount,
+			valuation_value,
+			mortgage_period,
+			<if test="mortgageStartingDate!=null and mortgageStartingDate!=''">
+			mortgage_starting_date,
+            </if>
+        <if test="mortgageEndingDate!=null and mortgageEndingDate!=''">
+			mortgage_ending_date,
+        </if>
+			mortgage_reason,
+			remarks,
+			electronic_proof_path,
+        <if test="electronicProofByte!=null">
+			electronic_proof_byte,
+        </if>
+			service_code,
+			data_json,
+			data_type,
+			provide_unit,
+			data_come_from_mode,
+            preservation_man,
+			insert_time,
+			ext1,
+			ext2,
+			ext3
+        ) values (
+          #{infoId},
+          #{receiptNumber},
+          #{acceptanceNumber,jdbcType=VARCHAR},
+		  #{immovableSite,jdbcType=VARCHAR},
+        #{mortgageCertificateNo,jdbcType=VARCHAR},
+        <if test="registrationDate!=null and registrationDate!=''">
+            str_to_date(#{registrationDate}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        #{mortgageMode,jdbcType=VARCHAR},
+        #{mortgageArea,jdbcType=DECIMAL},
+        #{creditAmount,jdbcType=DECIMAL},
+        #{mortgageAmount,jdbcType=DECIMAL},
+        #{valuationValue,jdbcType=DECIMAL},
+        #{mortgagePeriod,jdbcType=VARCHAR},
+        <if test="mortgageStartingDate!=null and mortgageStartingDate!=''">
+            str_to_date(#{mortgageStartingDate}, '%Y-%m-%d'),
+        </if>
+        <if test="mortgageEndingDate!=null and mortgageEndingDate!=''">
+            str_to_date(#{mortgageEndingDate}, '%Y-%m-%d'),
+        </if>
+        #{mortgageReason,jdbcType=VARCHAR},
+        #{remarks,jdbcType=VARCHAR},
+        #{electronicProofPath,jdbcType=VARCHAR},
+        <if test="electronicProofByte!=null">
+            #{electronicProofByte,jdbcType=VARCHAR},
+        </if>
+        #{serviceCode,jdbcType=VARCHAR},
+        #{dataJson,jdbcType=VARCHAR},
+        #{dataType,jdbcType=VARCHAR},
+        #{provideUnit,jdbcType=VARCHAR},
+        #{dataComeFromMode,jdbcType=VARCHAR},
+        #{preservationMan,jdbcType=VARCHAR},
+        str_to_date(#{insertTime}, '%Y-%m-%d %H:%i:%s'),
+        #{ext1,jdbcType=VARCHAR},
+        #{ext2,jdbcType=VARCHAR},
+        #{ext3,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateBdcdyxx" parameterType="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Bdcdyxgxx">
+        update sj_info_bdcdyxgxx set
+			receipt_number = #{receiptNumber},
+			acceptance_number = #{acceptanceNumber,jdbcType=VARCHAR},
+			immovable_site = #{immovableSite,jdbcType=VARCHAR},
+			mortgage_certificate_No = #{mortgageCertificateNo,jdbcType=VARCHAR},
+        <if test="registrationDate!=null and registrationDate!=''">
+			registration_date = str_to_date(#{registrationDate}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+			mortgage_mode = #{mortgageMode,jdbcType=VARCHAR},
+			mortgage_area = #{mortgageArea,jdbcType=DECIMAL},
+			credit_amount = #{creditAmount,jdbcType=DECIMAL},
+			mortgage_amount = #{mortgageAmount,jdbcType=DECIMAL},
+			valuation_value = #{valuationValue,jdbcType=DECIMAL},
+			mortgage_period = #{mortgagePeriod,jdbcType=VARCHAR},
+        <if test="mortgageStartingDate!=null and mortgageStartingDate!=''">
+            mortgage_starting_date = str_to_date(#{mortgageStartingDate}, '%Y-%m-%d'),
+        </if>
+        <if test="mortgageEndingDate!=null and mortgageEndingDate!=''">
+            mortgage_ending_date = str_to_date(#{mortgageEndingDate}, '%Y-%m-%d'),
+        </if>
+			mortgage_reason = #{mortgageReason,jdbcType=VARCHAR},
+			remarks = #{remarks,jdbcType=VARCHAR},
+			electronic_proof_path = #{electronicProofPath,jdbcType=VARCHAR},
+        <if test="electronicProofByte!=null">
+            electronic_proof_byte = #{electronicProofByte,jdbcType=VARCHAR},
+        </if>
+			service_code = #{serviceCode,jdbcType=VARCHAR},
+			data_json = #{dataJson,jdbcType=VARCHAR},
+			data_type = #{dataType,jdbcType=VARCHAR},
+			provide_unit = #{provideUnit,jdbcType=VARCHAR},
+			data_come_from_mode = #{dataComeFromMode,jdbcType=VARCHAR},
+            preservation_man = #{preservationMan,jdbcType=VARCHAR},
+			ext1 = #{ext1,jdbcType=VARCHAR},
+			ext2 = #{ext2,jdbcType=VARCHAR},
+			ext3 = #{ext3,jdbcType=VARCHAR}
+			where info_id = #{infoId}
+    </update>
+    <insert id="insertJyhtxx" parameterType="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Jyhtxx">
+        insert into sj_info_jyhtxx (
+        info_id,
+        receipt_number,
+        contract_id,
+        contract_number,
+        contract_record_number,
+        contract_type,
+        <if test="contractRecordTime!=null and contractRecordTime!=''">
+        contract_record_time,
+        </if>
+        <if test="contractSignTime!=null and contractSignTime!=''">
+        contract_sign_time,
+        </if>
+        contract_amount,
+        isReal,
+        service_code,
+        data_json,
+        provide_unit,
+        data_come_from_mode,
+        preservation_man,
+        insert_time,
+        ext1,
+        ext2,
+        ext3
+        ) values (
+        #{infoId},
+        #{receiptNumber},
+        #{contractId,jdbcType=VARCHAR},
+        #{contractNumber,jdbcType=VARCHAR},
+        #{contractRecordNumber,jdbcType=VARCHAR},
+        #{contractType,jdbcType=VARCHAR},
+        <if test="contractRecordTime!=null and contractRecordTime!=''">
+            str_to_date(#{contractRecordTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        <if test="contractSignTime!=null and contractSignTime!=''">
+            str_to_date(#{contractSignTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        #{contractAmount,jdbcType=DECIMAL},
+        #{isReal,jdbcType=VARCHAR},
+        #{serviceCode,jdbcType=VARCHAR},
+        #{dataJson,jdbcType=VARCHAR},
+        #{provideUnit,jdbcType=VARCHAR},
+        #{dataComeFromMode,jdbcType=VARCHAR},
+        #{preservationMan,jdbcType=VARCHAR},
+        str_to_date(#{insertTime}, '%Y-%m-%d %H:%i:%s'),
+        #{ext1,jdbcType=VARCHAR},
+        #{ext2,jdbcType=VARCHAR},
+        #{ext3,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="updateJyhtxx" parameterType="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Jyhtxx">
+        update sj_info_jyhtxx set
+        receipt_number=#{receiptNumber},
+        contract_id=#{contractId,jdbcType=VARCHAR},
+        contract_number=#{contractNumber,jdbcType=VARCHAR},
+        contract_record_number=#{contractRecordNumber,jdbcType=VARCHAR},
+        contract_type=#{contractType,jdbcType=VARCHAR},
+        <if test="contractRecordTime!=null and contractRecordTime!=''">
+            contract_record_time= str_to_date(#{contractRecordTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        <if test="contractSignTime!=null and contractSignTime!=''">
+            contract_sign_time=str_to_date(#{contractSignTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        contract_amount=#{contractAmount,jdbcType=DECIMAL},
+        isReal=#{isReal,jdbcType=VARCHAR},
+        service_code=#{serviceCode,jdbcType=VARCHAR},
+        data_json=#{dataJson,jdbcType=VARCHAR},
+        provide_unit=#{provideUnit,jdbcType=VARCHAR},
+        data_come_from_mode=#{dataComeFromMode,jdbcType=VARCHAR},
+        preservation_man = #{preservationMan,jdbcType=VARCHAR},
+        ext1=#{ext1,jdbcType=VARCHAR},
+        ext2=#{ext2,jdbcType=VARCHAR},
+        ext3=#{ext3,jdbcType=VARCHAR}
+        where info_id = #{infoId}
+    </update>
+
+    <insert id="insertDyhtxx" parameterType="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Dyhtxx">
+        insert into sj_info_dyhtxx (
+        info_id,
+        receipt_number,
+        mortgage_contract_number,
+		mortgage_mode,
+		mortgage_area,
+		credit_amount,
+		mortgage_amount,
+		valuation_value,
+		mortgage_period,
+        <if test="mortgageStartingDate!=null and mortgageStartingDate!=''">
+		mortgage_starting_date,
+        </if>
+        <if test="mortgageEndingDate!=null and mortgageEndingDate!=''">
+		mortgage_ending_date,
+        </if>
+		mortgage_reason,
+		maximum_claim_confirm,
+		maximum_claim_amount,
+		<if test="applyTime!=null and applyTime!=''">
+		apply_time,
+        </if>
+        service_code,
+        data_json,
+        provide_unit,
+        data_come_from_mode,
+        preservation_man,
+        insert_time,
+        ext1,
+        ext2,
+        ext3
+        ) values (
+        #{infoId},
+        #{receiptNumber},
+        #{mortgageContractNumber,jdbcType=VARCHAR},
+        #{mortgageMode,jdbcType=VARCHAR},
+        #{mortgageArea,jdbcType=DECIMAL},
+        #{creditAmount,jdbcType=DECIMAL},
+        #{mortgageAmount,jdbcType=DECIMAL},
+        #{valuationValue,jdbcType=DECIMAL},
+        #{mortgagePeriod,jdbcType=VARCHAR},
+        <if test="mortgageStartingDate!=null and mortgageStartingDate!=''">
+            str_to_date(#{mortgageStartingDate}, '%Y-%m-%d'),
+        </if>
+        <if test="mortgageEndingDate!=null and mortgageEndingDate!=''">
+            str_to_date(#{mortgageEndingDate}, '%Y-%m-%d'),
+        </if>
+        #{mortgageReason,jdbcType=VARCHAR},
+        #{maximumClaimConfirm,jdbcType=VARCHAR},
+        #{maximumClaimAmount,jdbcType=DECIMAL},
+        <if test="applyTime!=null and applyTime!=''">
+            str_to_date(#{applyTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        #{serviceCode,jdbcType=VARCHAR},
+        #{dataJson,jdbcType=VARCHAR},
+        #{provideUnit,jdbcType=VARCHAR},
+        #{dataComeFromMode,jdbcType=VARCHAR},
+        #{preservationMan,jdbcType=VARCHAR},
+        str_to_date(#{insertTime}, '%Y-%m-%d %H:%i:%s'),
+        #{ext1,jdbcType=VARCHAR},
+        #{ext2,jdbcType=VARCHAR},
+        #{ext3,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateDyhtxx" parameterType="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Dyhtxx">
+        update sj_info_dyhtxx set
+        receipt_number=#{receiptNumber},
+        mortgage_contract_number=#{mortgageContractNumber,jdbcType=VARCHAR},
+		mortgage_mode=#{mortgageMode,jdbcType=VARCHAR},
+		mortgage_area=#{mortgageArea,jdbcType=DECIMAL},
+		credit_amount=#{creditAmount,jdbcType=DECIMAL},
+		mortgage_amount= #{mortgageAmount,jdbcType=DECIMAL},
+		valuation_value=#{valuationValue,jdbcType=DECIMAL},
+		mortgage_period=#{mortgagePeriod,jdbcType=VARCHAR},
+        <if test="mortgageStartingDate!=null and mortgageStartingDate!=''">
+            mortgage_starting_date=str_to_date(#{mortgageStartingDate}, '%Y-%m-%d'),
+        </if>
+        <if test="mortgageEndingDate!=null and mortgageEndingDate!=''">
+            mortgage_ending_date=str_to_date(#{mortgageEndingDate}, '%Y-%m-%d'),
+        </if>
+		mortgage_reason=#{mortgageReason,jdbcType=VARCHAR},
+		maximum_claim_confirm=#{maximumClaimConfirm,jdbcType=VARCHAR},
+		maximum_claim_amount= #{maximumClaimAmount,jdbcType=DECIMAL},
+        <if test="applyTime!=null and applyTime!=''">
+		apply_time=str_to_date(#{applyTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        service_code=#{serviceCode,jdbcType=VARCHAR},
+        data_json=#{dataJson,jdbcType=VARCHAR},
+        provide_unit=#{provideUnit,jdbcType=VARCHAR},
+        data_come_from_mode=#{dataComeFromMode,jdbcType=VARCHAR},
+        preservation_man=#{preservationMan,jdbcType=VARCHAR},
+        ext1=#{ext1,jdbcType=VARCHAR},
+        ext2=#{ext2,jdbcType=VARCHAR},
+        ext3=#{ext3,jdbcType=VARCHAR}
+        where info_id = #{infoId}
+    </update>
+
+    <insert id="insertQsxx" parameterType="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Qsxx">
+        insert into sj_info_qsxx (
+        info_id,
+        receipt_number,
+        service_code,
+        data_json,
+        provide_unit,
+        data_come_from_mode,
+        preservation_man,
+        insert_time,
+        ext1,
+        ext2,
+        ext3,
+        xtsphm,
+        zrfcsfbz,
+        htbh,
+        nsrsbh,
+        nsrmc,
+        dzsphm,
+        pzzl_dm,
+        pzzg_dm,
+        pzhm,
+        skssqq,
+        skssqz,
+        zsxm_dm,
+        zspm_dm,
+        zszm_dm,
+        zsxm_mc,
+        zspm_mc,
+        zszm_mc,
+        jsyj,
+        sl,
+        sjje,
+        zgswskfj_dm,
+        zsswjg_dm,
+        skssswjg_dm,
+        zgswskfj_mc,
+        zsswjg_mc,
+        skssswjg_mc,
+        kjrq,
+        bz,
+        bdcdyh
+        ) values (
+        #{infoId},
+        #{receiptNumber},
+        #{serviceCode,jdbcType=VARCHAR},
+        #{dataJson,jdbcType=VARCHAR},
+        #{provideUnit,jdbcType=VARCHAR},
+        #{dataComeFromMode,jdbcType=VARCHAR},
+        #{preservationMan,jdbcType=VARCHAR},
+        str_to_date(#{insertTime}, '%Y-%m-%d %H:%i:%s'),
+        #{ext1,jdbcType=VARCHAR},
+        #{ext2,jdbcType=VARCHAR},
+        #{ext3,jdbcType=VARCHAR},
+        #{xtsphm,jdbcType=VARCHAR},
+        #{zrfcsfbz,jdbcType=VARCHAR},
+        #{htbh,jdbcType=VARCHAR},
+        #{nsrsbh,jdbcType=VARCHAR},
+        #{nsrmc,jdbcType=VARCHAR},
+        #{dzsphm,jdbcType=VARCHAR},
+        #{pzzlDm,jdbcType=VARCHAR},
+        #{pzzgDm,jdbcType=VARCHAR},
+        #{pzhm,jdbcType=VARCHAR},
+        #{skssqq,jdbcType=VARCHAR},
+        #{skssqz,jdbcType=VARCHAR},
+        #{zsxmDm,jdbcType=VARCHAR},
+        #{zspmDm,jdbcType=VARCHAR},
+        #{zszmDm,jdbcType=VARCHAR},
+        #{zsxmMc,jdbcType=VARCHAR},
+        #{zspmMc,jdbcType=VARCHAR},
+        #{zszmMc,jdbcType=VARCHAR},
+        #{jsyj,jdbcType=VARCHAR},
+        #{sl,jdbcType=VARCHAR},
+        #{sjje,jdbcType=DECIMAL},
+        #{zgswskfjDm,jdbcType=VARCHAR},
+        #{zsswjgDm,jdbcType=VARCHAR},
+        #{skssswjgDm,jdbcType=VARCHAR},
+        #{zgswskfjMc,jdbcType=VARCHAR},
+        #{zsswjgMc,jdbcType=VARCHAR},
+        #{skssswjgMc,jdbcType=VARCHAR},
+        #{kjrq,jdbcType=VARCHAR},
+        #{bz,jdbcType=VARCHAR},
+        #{bdcdyh,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateQsxx" parameterType="com.ztgeo.general.entity.service_data.pub_data.Sj_Info_Qsxx">
+        update sj_info_qsxx set
+        receipt_number=#{receiptNumber},
+        service_code=#{serviceCode,jdbcType=VARCHAR},
+        data_json=#{dataJson,jdbcType=VARCHAR},
+        provide_unit=#{provideUnit,jdbcType=VARCHAR},
+        data_come_from_mode=#{dataComeFromMode,jdbcType=VARCHAR},
+        preservation_man=#{preservationMan,jdbcType=VARCHAR},
+        ext1=#{ext1,jdbcType=VARCHAR},
+        ext2=#{ext2,jdbcType=VARCHAR},
+        ext3=#{ext3,jdbcType=VARCHAR},
+        xtsphm = #{xtsphm,jdbcType=VARCHAR},
+        zrfcsfbz = #{zrfcsfbz,jdbcType=VARCHAR},
+        htbh = #{htbh,jdbcType=VARCHAR},
+        nsrsbh = #{nsrsbh,jdbcType=VARCHAR},
+        nsrmc = #{nsrmc,jdbcType=VARCHAR},
+        dzsphm = #{dzsphm,jdbcType=VARCHAR},
+        pzzl_dm = #{pzzlDm,jdbcType=VARCHAR},
+        pzzg_dm = #{pzzgDm,jdbcType=VARCHAR},
+        pzhm = #{pzhm,jdbcType=VARCHAR},
+        skssqq = #{skssqq,jdbcType=VARCHAR},
+        skssqz = #{skssqz,jdbcType=VARCHAR},
+        zsxm_dm = #{zsxmDm,jdbcType=VARCHAR},
+        zspm_dm = #{zspmDm,jdbcType=VARCHAR},
+        zszm_dm = #{zszmDm,jdbcType=VARCHAR},
+        zsxm_mc = #{zsxmMc,jdbcType=VARCHAR},
+        zspm_mc = #{zspmMc,jdbcType=VARCHAR},
+        zszm_mc = #{zszmMc,jdbcType=VARCHAR},
+        jsyj = #{jsyj,jdbcType=VARCHAR},
+        sl = #{sl,jdbcType=VARCHAR},
+        sjje = #{sjje,jdbcType=DECIMAL},
+        zgswskfj_dm = #{zgswskfjDm,jdbcType=VARCHAR},
+        zsswjg_dm = #{zsswjgDm,jdbcType=VARCHAR},
+        skssswjg_dm = #{skssswjgDm,jdbcType=VARCHAR},
+        zgswskfj_mc = #{zgswskfjMc,jdbcType=VARCHAR},
+        zsswjg_mc = #{zsswjgMc,jdbcType=VARCHAR},
+        skssswjg_mc = #{skssswjgMc,jdbcType=VARCHAR},
+        kjrq = #{kjrq,jdbcType=VARCHAR},
+        bz = #{bz,jdbcType=VARCHAR},
+        bdcdyh = #{bdcdyh,jdbcType=VARCHAR}
+        where info_id = #{infoId}
+    </update>
+
+    <insert id="insertHandleResult" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Info_Handle_Result">
+        insert into sj_info_handle_result (
+        info_id,
+        receipt_number,
+        acceptance_number,
+        handle_result,
+        handle_text,
+        remarks,
+        service_code,
+        data_json,
+        provide_unit,
+        data_come_from_mode,
+        preservation_man,
+        insert_time,
+        ext1,
+        ext2,
+        ext3
+        ) values (
+        #{infoId},
+        #{receiptNumber},
+        #{acceptanceNumber,jdbcType=VARCHAR},
+        #{handleResult,jdbcType=VARCHAR},
+        #{handleText,jdbcType=VARCHAR},
+        #{remarks,jdbcType=VARCHAR},
+        #{serviceCode,jdbcType=VARCHAR},
+        #{dataJson,jdbcType=VARCHAR},
+        #{provideUnit,jdbcType=VARCHAR},
+        #{dataComeFromMode,jdbcType=VARCHAR},
+        #{preservationMan,jdbcType=VARCHAR},
+        str_to_date(#{insertTime}, '%Y-%m-%d %H:%i:%s'),
+        #{ext1,jdbcType=VARCHAR},
+        #{ext2,jdbcType=VARCHAR},
+        #{ext3,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateHandleResult" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Info_Handle_Result">
+        update sj_info_handle_result set
+        receipt_number=#{receiptNumber},
+        acceptance_number = #{acceptanceNumber,jdbcType=VARCHAR},
+        handle_result = #{handleResult,jdbcType=VARCHAR},
+        handle_text = #{handleText,jdbcType=VARCHAR},
+        remarks = #{remarks,jdbcType=VARCHAR},
+        service_code=#{serviceCode,jdbcType=VARCHAR},
+        data_json=#{dataJson,jdbcType=VARCHAR},
+        provide_unit=#{provideUnit,jdbcType=VARCHAR},
+        data_come_from_mode=#{dataComeFromMode,jdbcType=VARCHAR},
+        preservation_man=#{preservationMan,jdbcType=VARCHAR},
+        ext1=#{ext1,jdbcType=VARCHAR},
+        ext2=#{ext2,jdbcType=VARCHAR},
+        ext3=#{ext3,jdbcType=VARCHAR}
+        where info_id = #{infoId}
+    </update>
+    <insert id="insertBdcgl" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Gl">
+        insert into sj_bdc_gl (
+          relation_id,
+          info_id,
+          immovable_id,
+          immovable_type,
+          info_table_identification,
+          status
+        ) values (
+          #{relationId},
+          #{infoId},
+          #{immovableId},
+          #{immovableType,jdbcType=VARCHAR},
+          #{infoTableIdentification,jdbcType=VARCHAR},
+          #{status,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateBdcgl" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Gl">
+        update sj_bdc_gl set
+          info_id=#{infoId},
+          immovable_id=#{immovableId},
+          immovable_type=#{immovableType,jdbcType=VARCHAR},
+          info_table_identification=#{infoTableIdentification,jdbcType=VARCHAR},
+          status=#{status,jdbcType=VARCHAR}
+          where relation_id=#{relationId}
+    </update>
+    <insert id="insertZdInfo" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Zd_Info">
+insert into sj_bdc_zd_info(
+	parcel_id,
+	parcel_type,
+	parcel_unicode,
+	immovable_unit_number,
+	cadastral_number,
+	parcel_location,
+	land_use,
+	common_land_area,
+	private_land_area,
+	apportionment_land_area,
+	mortgage_situation,
+	closure_situation,
+	objection_situation,
+	remarks,
+	status,
+	ext1,
+	ext2,
+	ext3
+) values (
+	#{parcelId},
+    #{parcelType,jdbcType=VARCHAR},
+    #{parcelUnicode,jdbcType=VARCHAR},
+    #{immovableUnitNumber,jdbcType=VARCHAR},
+    #{cadastralNumber,jdbcType=VARCHAR},
+    #{parcelLocation,jdbcType=VARCHAR},
+    #{landUse,jdbcType=VARCHAR},
+    #{commonLandArea,jdbcType=DECIMAL},
+    #{privateLandArea,jdbcType=DECIMAL},
+    #{apportionmentLandArea,jdbcType=DECIMAL},
+    #{mortgageSituation,jdbcType=VARCHAR},
+    #{closureSituation,jdbcType=VARCHAR},
+    #{objectionSituation,jdbcType=VARCHAR},
+    #{remarks,jdbcType=VARCHAR},
+    #{status,jdbcType=VARCHAR},
+    #{ext1,jdbcType=VARCHAR},
+    #{ext2,jdbcType=VARCHAR},
+    #{ext3,jdbcType=VARCHAR}
+)
+    </insert>
+    <update id="updateZdInfo" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Zd_Info">
+update sj_bdc_zd_info set
+	parcel_type = #{parcelType,jdbcType=VARCHAR},
+	parcel_unicode = #{parcelUnicode,jdbcType=VARCHAR},
+	immovable_unit_number = #{immovableUnitNumber,jdbcType=VARCHAR},
+	cadastral_number = #{cadastralNumber,jdbcType=VARCHAR},
+	parcel_location = #{parcelLocation,jdbcType=VARCHAR},
+	land_use = #{landUse,jdbcType=VARCHAR},
+	common_land_area = #{commonLandArea,jdbcType=DECIMAL},
+	private_land_area = #{privateLandArea,jdbcType=DECIMAL},
+	apportionment_land_area = #{apportionmentLandArea,jdbcType=DECIMAL},
+	mortgage_situation = #{mortgageSituation,jdbcType=VARCHAR},
+	closure_situation = #{closureSituation,jdbcType=VARCHAR},
+	objection_situation = #{objectionSituation,jdbcType=VARCHAR},
+	remarks = #{remarks,jdbcType=VARCHAR},
+	status = #{status,jdbcType=VARCHAR},
+	ext1 = #{ext1,jdbcType=VARCHAR},
+	ext2 = #{ext2,jdbcType=VARCHAR},
+	ext3 = #{ext3,jdbcType=VARCHAR}
+where parcel_id = #{parcelId}
+    </update>
+    <insert id="insertFdInfo" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Fw_Info">
+insert into sj_bdc_fw_info(
+	house_id,
+	household_id,
+	seat_id,
+	building_number,
+	house_number,
+	immovable_unicode,
+	immovable_planning_use,
+	house_location,
+	immovable_unit_number,
+	household_number,
+	seat_number,
+	household_mark,
+	room_mark,
+	unit_mark,
+	total_storey,
+	location_storey,
+	project_name,
+	architectural_area,
+	house_architectural_area,
+	apportionment_architectural_area,
+	building_name,
+	mortgage_situation,
+	closure_situation,
+	objection_situation,
+	remarks,
+	status,
+	ext1,
+	ext2,
+	ext3
+) values (
+	#{houseId},
+    #{householdId,jdbcType=VARCHAR},
+    #{seatId,jdbcType=VARCHAR},
+    #{buildingNumber,jdbcType=VARCHAR},
+    #{houseNumber,jdbcType=VARCHAR},
+    #{immovableUnicode,jdbcType=VARCHAR},
+    #{immovablePlanningUse,jdbcType=VARCHAR},
+    #{houseLocation,jdbcType=VARCHAR},
+    #{immovableUnitNumber,jdbcType=VARCHAR},
+    #{householdNumber,jdbcType=VARCHAR},
+    #{seatNumber,jdbcType=VARCHAR},
+    #{householdMark,jdbcType=VARCHAR},
+    #{roomMark,jdbcType=VARCHAR},
+    #{unitMark,jdbcType=VARCHAR},
+    #{totalStorey,jdbcType=VARCHAR},
+    #{locationStorey,jdbcType=VARCHAR},
+    #{projectName,jdbcType=VARCHAR},
+    #{architecturalArea,jdbcType=DECIMAL},
+    #{houseArchitecturalArea,jdbcType=DECIMAL},
+    #{apportionmentArchitecturalArea,jdbcType=DECIMAL},
+    #{buildingName,jdbcType=VARCHAR},
+    #{mortgageSituation,jdbcType=VARCHAR},
+    #{closureSituation,jdbcType=VARCHAR},
+    #{objectionSituation,jdbcType=VARCHAR},
+    #{remarks,jdbcType=VARCHAR},
+    #{status,jdbcType=VARCHAR},
+    #{ext1,jdbcType=VARCHAR},
+    #{ext2,jdbcType=VARCHAR},
+    #{ext3,jdbcType=VARCHAR}
+)
+    </insert>
+    <update id="updateFdInfo" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Fw_Info">
+update sj_bdc_fw_info set
+	household_id=#{householdId,jdbcType=VARCHAR},
+	seat_id=#{seatId,jdbcType=VARCHAR},
+	building_number=#{buildingNumber,jdbcType=VARCHAR},
+	house_number=#{houseNumber,jdbcType=VARCHAR},
+	immovable_unicode=#{immovableUnicode,jdbcType=VARCHAR},
+	immovable_planning_use=#{immovablePlanningUse,jdbcType=VARCHAR},
+	house_location=#{houseLocation,jdbcType=VARCHAR},
+	immovable_unit_number=#{immovableUnitNumber,jdbcType=VARCHAR},
+	household_number=#{householdNumber,jdbcType=VARCHAR},
+	seat_number=#{seatNumber,jdbcType=VARCHAR},
+	household_mark=#{householdMark,jdbcType=VARCHAR},
+	room_mark=#{roomMark,jdbcType=VARCHAR},
+	unit_mark=#{unitMark,jdbcType=VARCHAR},
+	total_storey=#{totalStorey,jdbcType=VARCHAR},
+	location_storey=#{locationStorey,jdbcType=VARCHAR},
+	project_name=#{projectName,jdbcType=VARCHAR},
+	architectural_area=#{architecturalArea,jdbcType=DECIMAL},
+	house_architectural_area=#{houseArchitecturalArea,jdbcType=DECIMAL},
+	apportionment_architectural_area=#{apportionmentArchitecturalArea,jdbcType=DECIMAL},
+	building_name=#{buildingName,jdbcType=VARCHAR},
+	mortgage_situation=#{mortgageSituation,jdbcType=VARCHAR},
+	closure_situation=#{closureSituation,jdbcType=VARCHAR},
+	objection_situation=#{objectionSituation,jdbcType=VARCHAR},
+	remarks=#{remarks,jdbcType=VARCHAR},
+	status=#{status,jdbcType=VARCHAR},
+	ext1=#{ext1,jdbcType=VARCHAR},
+	ext2=#{ext2,jdbcType=VARCHAR},
+	ext3=#{ext3,jdbcType=VARCHAR}
+where house_id=#{houseId}
+    </update>
+    <insert id="insertQlrgl" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Qlr_Gl">
+insert into sj_qlr_gl (
+	relation_id,
+	info_id,
+	obligee_id,
+	obligee_name,
+	obligee_type,
+	obligee_order,
+	shared_mode,
+	shared_value,
+	info_table_identification,
+	status
+) values (
+	#{relationId},
+    #{infoId,jdbcType=VARCHAR},
+    #{obligeeId,jdbcType=VARCHAR},
+    #{obligeeName,jdbcType=VARCHAR},
+    #{obligeeType,jdbcType=VARCHAR},
+    #{obligeeOrder,jdbcType=INTEGER},
+    #{sharedMode,jdbcType=VARCHAR},
+    #{sharedValue,jdbcType=INTEGER},
+    #{infoTableIdentification,jdbcType=VARCHAR},
+    #{status,jdbcType=VARCHAR}
+)
+    </insert>
+    <update id="updateQlrgl" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Qlr_Gl">
+update sj_qlr_gl set
+	info_id=#{infoId,jdbcType=VARCHAR},
+	obligee_id=#{obligeeId,jdbcType=VARCHAR},
+	obligee_name=#{obligeeName,jdbcType=VARCHAR},
+	obligee_type=#{obligeeType,jdbcType=VARCHAR},
+	obligee_order=#{obligeeOrder,jdbcType=INTEGER},
+	shared_mode=#{sharedMode,jdbcType=VARCHAR},
+	shared_value=#{sharedValue,jdbcType=INTEGER},
+	info_table_identification=#{infoTableIdentification,jdbcType=VARCHAR},
+	status = #{status,jdbcType=VARCHAR}
+where relation_id=#{relationId}
+    </update>
+    <insert id="insertQlr" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Qlr_Info">
+insert into sj_qlr_info (
+	obligee_id,
+	obligee_name,
+	obligee_document_type,
+	obligee_document_number,
+	status,
+	ext1,
+	ext2,
+	ext3
+) values (
+	#{obligeeId,jdbcType=VARCHAR},
+    #{obligeeName,jdbcType=VARCHAR},
+    #{obligeeDocumentType,jdbcType=VARCHAR},
+    #{obligeeDocumentNumber,jdbcType=VARCHAR},
+    #{status,jdbcType=VARCHAR},
+    #{ext1,jdbcType=VARCHAR},
+    #{ext2,jdbcType=VARCHAR},
+    #{ext3,jdbcType=VARCHAR}
+)
+    </insert>
+    <update id="updateQlr" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Qlr_Info">
+update sj_qlr_info set
+	obligee_name=#{obligeeName,jdbcType=VARCHAR},
+	obligee_document_type=#{obligeeDocumentType,jdbcType=VARCHAR},
+	obligee_document_number=#{obligeeDocumentNumber,jdbcType=VARCHAR},
+	status=#{status,jdbcType=VARCHAR},
+	ext1=#{ext1,jdbcType=VARCHAR},
+	ext2=#{ext2,jdbcType=VARCHAR},
+	ext3=#{ext3,jdbcType=VARCHAR}
+where
+	obligee_id=#{obligeeId}
+    </update>
+
+    <resultMap id="infoMap" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Information">
+        <result property="infoId" column="info_id"></result>
+        <result property="receiptNumber" column="receipt_number"></result>
+        <result property="serviceCode" column="service_code"></result>
+        <result property="preservationMan" column="preservation_man"></result>
+    </resultMap>
+    <select id="selectBDCQLServiceInformationByInfoId" parameterType="java.lang.String" resultMap="infoMap">
+        select info_id, receipt_number, service_code, preservation_man from sj_info_bdcqlxgxx t where t.info_id = #{infoId}
+    </select>
+    <select id="selectBDCDYServiceInformationByInfoId" parameterType="java.lang.String" resultMap="infoMap">
+        select info_id, receipt_number, service_code, preservation_man from sj_info_bdcdyxgxx t where t.info_id = #{infoId}
+    </select>
+    <select id="selectJYHTServiceInformationByInfoId" parameterType="java.lang.String" resultMap="infoMap">
+        select info_id, receipt_number, service_code, preservation_man from sj_info_jyhtxx t where t.info_id = #{infoId}
+    </select>
+    <select id="selectDYHTServiceInformationByInfoId" parameterType="java.lang.String" resultMap="infoMap">
+        select info_id, receipt_number, service_code, preservation_man from sj_info_dyhtxx t where t.info_id = #{infoId}
+    </select>
+    <select id="selectHandleServiceInformationByInfoId" parameterType="java.lang.String" resultMap="infoMap">
+        select info_id, receipt_number, service_code, preservation_man from sj_info_handle_result t where t.info_id = #{infoId}
+    </select>
+    <select id="selectBDCNoCertServiceInformationByInfoId" parameterType="java.lang.String" resultMap="infoMap">
+        select info_id, receipt_number, service_code, preservation_man from sj_info_immovalbe t where t.info_id = #{infoId}
+    </select>
+    <select id="selectQSServiceInformationByInfoId" parameterType="java.lang.String" resultMap="infoMap">
+        select info_id, receipt_number, service_code, preservation_man from sj_info_qsxx t where t.info_id = #{infoId}
+    </select>
+    <select id="selectQlrGlByInfoIdOnly" parameterType="java.lang.String" resultMap="qlrgls">
+        SELECT
+	  t1.*, t2.obligee_id qlrid,
+	  t2.obligee_name qlrmc,
+	  t2.obligee_document_type qlrzjlx,
+	  t2.obligee_document_number qlrzjhm,
+	  t2.`status` qlrzt,
+	  t2.ext1,
+	  t2.ext2,
+	  t2.ext3
+    FROM
+	  sj_qlr_gl t1
+    LEFT JOIN sj_qlr_info t2 ON t1.obligee_id = t2.obligee_id
+    WHERE
+	  t1.info_id = #{infoId}
+    </select>
+
+    <delete id="deleteFWById" parameterType="java.lang.String">
+        delete from sj_bdc_fw_info where house_id = #{id}
+    </delete>
+    <delete id="deleteZDById" parameterType="java.lang.String">
+        delete from sj_bdc_zd_info where parcel_id = #{id}
+    </delete>
+    <delete id="deleteBDCGLById" parameterType="java.lang.String">
+        delete from sj_bdc_gl where relation_id = #{id}
+    </delete>
+    <delete id="deleteQlrById" parameterType="java.lang.String">
+        delete from sj_qlr_info where obligee_id = #{id}
+    </delete>
+    <delete id="deleteQlrGlById" parameterType="java.lang.String">
+        delete from sj_qlr_gl where relation_id = #{id}
+    </delete>
+    <delete id="deleteBDCQLById" parameterType="java.lang.String">
+        delete from sj_info_bdcqlxgxx where info_id = #{id}
+    </delete>
+    <delete id="deleteBDCDYById" parameterType="java.lang.String">
+        delete from sj_info_bdcdyxgxx where info_id = #{id}
+    </delete>
+    <delete id="deleteJYHTById" parameterType="java.lang.String">
+        delete from sj_info_jyhtxx where info_id = #{id}
+    </delete>
+    <delete id="deleteDYHTById" parameterType="java.lang.String">
+        delete from sj_info_dyhtxx where info_id = #{id}
+    </delete>
+    <delete id="deleteQSById" parameterType="java.lang.String">
+        delete from sj_info_qsxx where info_id = #{id}
+    </delete>
+    <delete id="deleteHandleById" parameterType="java.lang.String">
+        delete from sj_info_handle_result where info_id = #{id}
+    </delete>
+    <delete id="deleteBDCNoCertById" parameterType="java.lang.String">
+        delete from sj_info_immovalbe where info_id = #{id}
+    </delete>
+
+    <resultMap id="exeDeparts" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Execute_depart"></resultMap>
+    <select id="selectExeDepart" parameterType="java.lang.String" resultMap="exeDeparts">
+        select * from sj_execute_depart where receipt_number = #{receiptNumber}
+    </select>
+    <insert id="insertExeDepart" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Execute_depart">
+        insert into sj_execute_depart(id,receipt_number,execute_depart,status) values (#{id},#{receiptNumber,jdbcType=VARCHAR},#{executeDepart,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR})
+    </insert>
+    <update id="updateExeDepart" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Execute_depart">
+        update sj_execute_depart set
+          receipt_number = #{receiptNumber,jdbcType=VARCHAR},
+          execute_depart = #{executeDepart,jdbcType=VARCHAR},
+          status = #{status,jdbcType=VARCHAR}
+        where
+          id = #{id}
+    </update>
+</mapper>

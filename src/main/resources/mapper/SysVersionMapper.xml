@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.penghao.SysVersionMapper" >
+  <resultMap id="BaseResultMap" type="com.ztgeo.general.entity.service_data.sys_data.SysVersion" >
+    <id column="sys_id" property="sysId" jdbcType="VARCHAR" />
+    <result column="sys_name" property="name" jdbcType="VARCHAR" />
+    <result column="sys_version" property="version" jdbcType="VARCHAR" />
+    <result column="sys_url" property="sysUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    sys_id, sys_name, sys_version, sys_url
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_version
+    where sys_id = #{sysId,jdbcType=VARCHAR}
+  </select>
+
+  <select id="findSysVersion" resultMap="BaseResultMap">
+    select * from  sys_version
+  </select>
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from sys_version
+    where sys_id = #{sysId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.ztgeo.general.entity.service_data.sys_data.SysVersion" >
+    insert into sys_version (sys_id, sys_name, sys_version, 
+      sys_url)
+    values (#{sysId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR},
+      #{sysUrl,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ztgeo.general.entity.service_data.sys_data.SysVersion" >
+    insert into sys_version
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="sysId != null" >
+        sys_id,
+      </if>
+      <if test="name != null" >
+        sys_name,
+      </if>
+      <if test="version != null" >
+        sys_version,
+      </if>
+      <if test="sysUrl != null" >
+        sys_url,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="sysId != null" >
+        #{sysId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{sysName,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        #{sysVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="sysUrl != null" >
+        #{sysUrl,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ztgeo.general.entity.service_data.sys_data.SysVersion" >
+    update sys_version
+    <set >
+      <if test="name != null" >
+        sys_name = #{sysName,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        sys_version = #{sysVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="sysUrl != null" >
+        sys_url = #{sysUrl,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where sys_id = #{sysId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ztgeo.general.entity.service_data.sys_data.SysVersion" >
+    update sys_version
+    set sys_name = #{name,jdbcType=VARCHAR},
+      sys_version = #{version,jdbcType=VARCHAR},
+      sys_url = #{sysUrl,jdbcType=VARCHAR}
+    where sys_id = #{sysId,jdbcType=VARCHAR}
+  </update>
+</mapper>

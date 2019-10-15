@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.chenbin.PrintSettingMapper">
+    <select id="selectModelIdByReceiptNumber" parameterType="java.lang.String" resultType="java.lang.String">
+        select APPROVE_PROCESSINSTANCEID from act_approve where APPROVE_FK_ID = #{receiptNumber}
+    </select>
+</mapper>

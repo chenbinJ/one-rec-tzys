@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.penghao.SjHandleFlowMapper" >
+  <resultMap id="BaseResultMap" type="com.ztgeo.general.entity.service_data.pub_data.SjHandleFlow" >
+    <id column="handle_id" property="handleId" jdbcType="VARCHAR" />
+    <result column="handle_zjhm" property="handleZjhm" jdbcType="VARCHAR" />
+    <result column="handle_xb" property="handleXb" jdbcType="VARCHAR" />
+    <result column="handle_csrq" property="handleCsrq"  />
+    <result column="handle_mz" property="handleMz" jdbcType="VARCHAR" />
+    <result column="handle_name" property="handleName" jdbcType="VARCHAR" />
+    <result column="handle_dz" property="handleDz" jdbcType="VARCHAR" />
+    <result column="handle_dh" property="handleDh" jdbcType="VARCHAR" />
+    <result column="handle_fzjg" property="handleFzjg" jdbcType="VARCHAR" />
+    <result column="handle_yxqsrq" property="handleYxqsrq"  />
+    <result column="handle_yxjzrq" property="handleYxjzrq"  />
+    <result column="handle_process" property="handleProcess" jdbcType="VARCHAR" />
+    <result column="handle_createby" property="handleCreateBy" jdbcType="VARCHAR"/>
+    <result column="handle_scene_file" property="handleSceneFile" jdbcType="VARCHAR"/>
+    <result column="handle_identity_file" property="handleIdentityFile" jdbcType="VARCHAR"/>
+    <result column="handle_createtime" property="handleCreateTime" />
+    <result column="handle_notice_person" property="handleNoticePerson" jdbcType="VARCHAR"/>
+    <result column="handle_compateResult" property="handleCompateResult" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    handle_id, handle_zjhm, handle_xb, handle_csrq, handle_mz, handle_dz, handle_dh,handle_scene_file,handle_identity_file,handle_compateResult
+    handle_fzjg, handle_yxqsrq, handle_yxjzrq, handle_process,handle_createby,handle_createtime,handle_notice_person,handle_name
+  </sql>
+  <select id="findHandleFlowByProcess"  resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from sj_handle_flow
+    where handle_process = #{processId}
+  </select>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from sj_handle_flow
+    where handle_id = #{handleId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from sj_handle_flow
+    where handle_id = #{handleId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.ztgeo.general.entity.service_data.pub_data.SjHandleFlow" >
+    insert into sj_handle_flow (handle_id, handle_zjhm, handle_xb,
+      handle_csrq, handle_mz, handle_dz,
+      handle_dh, handle_fzjg, handle_yxqsrq,
+      handle_yxjzrq, handle_process,handle_createby,handle_createtime,handle_notice_person
+       ,handle_compateResult,handle_name,handle_scene_file,handle_identity_file)
+    values (#{handleId,jdbcType=VARCHAR}, #{handleZjhm,jdbcType=VARCHAR}, #{handleXb,jdbcType=VARCHAR},
+      #{handleCsrq}, #{handleMz,jdbcType=VARCHAR}, #{handleDz,jdbcType=VARCHAR},
+      #{handleDh,jdbcType=VARCHAR}, #{handleFzjg,jdbcType=VARCHAR}, #{handleYxqsrq},
+      #{handleYxjzrq}, #{handleProcess},#{handleCreateBy},#{handleCreateTime},#{handleNoticePerson},
+      #{handleCompateResult},#{handleName},#{handleSceneFile},#{handleIdentityFile})
+  </insert>
+  
+  <insert id="insertList" parameterType="java.util.List">
+    insert into sj_handle_flow (
+      handle_id, handle_zjhm, handle_xb,
+      handle_csrq, handle_mz, handle_dz,
+      handle_dh, handle_fzjg, handle_yxqsrq,
+      handle_yxjzrq, handle_process,handle_createby,handle_createtime,handle_notice_person
+      ,handle_compateResult,handle_name,handle_scene_file,handle_identity_file
+      )
+      values
+    <foreach collection="list" separator="," item="item" index="index">
+      (
+        #{item.handleId}, #{item.handleZjhm}, #{item.handleXb},
+        #{item.handleCsrq}, #{item.handleMz}, #{item.handleDz},
+        #{item.handleDh}, #{item.handleFzjg}, #{item.handleYxqsrq},
+        #{item.handleYxjzrq}, #{item.handleProcess,jdbcType=VARCHAR},#{item.handleCreateBy},
+        #{item.handleCreateTime},#{item.handleNoticePerson},#{item.handleCompateResult},#{item.handleName},
+        #{item.handleSceneFile},#{item.handleIdentityFile}
+      )
+    </foreach>
+
+  </insert>
+  
+  
+  <insert id="insertSelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.SjHandleFlow" >
+    insert into sj_handle_flow
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="handleId != null" >
+        handle_id,
+      </if>
+      <if test="handleZjhm != null" >
+        handle_zjhm,
+      </if>
+      <if test="handleXb != null" >
+        handle_xb,
+      </if>
+      <if test="handleCsrq != null" >
+        handle_csrq,
+      </if>
+      <if test="handleMz != null" >
+        handle_mz,
+      </if>
+      <if test="handleDz != null" >
+        handle_dz,
+      </if>
+      <if test="handleDh != null" >
+        handle_dh,
+      </if>
+      <if test="handleFzjg != null" >
+        handle_fzjg,
+      </if>
+      <if test="handleYxqsrq != null" >
+        handle_yxqsrq,
+      </if>
+      <if test="handleYxjzrq != null" >
+        handle_yxjzrq,
+      </if>
+      <if test="handleProcess != null" >
+        handle_process,
+      </if>
+      <if test="handleCreateBy != null" >
+        handle_createby,
+      </if>
+      <if test="handleCreateTime != null" >
+        handle_createtime,
+      </if>
+      <if test="handleName != null" >
+        handle_name,
+      </if>
+      <if test="handleCompateResult != null" >
+        handle_compateResult,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="handleId != null" >
+        #{handleId,jdbcType=VARCHAR},
+      </if>
+      <if test="handleZjhm != null" >
+        #{handleZjhm,jdbcType=VARCHAR},
+      </if>
+      <if test="handleXb != null" >
+        #{handleXb,jdbcType=VARCHAR},
+      </if>
+      <if test="handleCsrq != null" >
+        #{handleCsrq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handleMz != null" >
+        #{handleMz,jdbcType=VARCHAR},
+      </if>
+      <if test="handleDz != null" >
+        #{handleDz,jdbcType=VARCHAR},
+      </if>
+      <if test="handleDh != null" >
+        #{handleDh,jdbcType=VARCHAR},
+      </if>
+      <if test="handleFzjg != null" >
+        #{handleFzjg,jdbcType=VARCHAR},
+      </if>
+      <if test="handleYxqsrq != null" >
+        #{handleYxqsrq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handleYxjzrq != null" >
+        #{handleYxjzrq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handleProcess != null" >
+        #{handleProcess,jdbcType=VARCHAR},
+      </if>
+      <if test="handleCreateBy != null" >
+        #{handleCreateBy},
+      </if>
+      <if test="handleCreateTime != null" >
+        #{handleCreateTime},
+      </if>
+      <if test="handleName != null" >
+        #{handleName},
+      </if>
+      <if test="handleCompateResult != null" >
+        #{handleCompateResult},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.SjHandleFlow" >
+    update sj_handle_flow
+    <set >
+      <if test="handleZjhm != null" >
+        handle_zjhm = #{handleZjhm,jdbcType=VARCHAR},
+      </if>
+      <if test="handleXb != null" >
+        handle_xb = #{handleXb,jdbcType=VARCHAR},
+      </if>
+      <if test="handleCsrq != null" >
+        handle_csrq = #{handleCsrq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handleMz != null" >
+        handle_mz = #{handleMz,jdbcType=VARCHAR},
+      </if>
+      <if test="handleDz != null" >
+        handle_dz = #{handleDz,jdbcType=VARCHAR},
+      </if>
+      <if test="handleDh != null" >
+        handle_dh = #{handleDh,jdbcType=VARCHAR},
+      </if>
+      <if test="handleFzjg != null" >
+        handle_fzjg = #{handleFzjg,jdbcType=VARCHAR},
+      </if>
+      <if test="handleYxqsrq != null" >
+        handle_yxqsrq = #{handleYxqsrq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handleYxjzrq != null" >
+        handle_yxjzrq = #{handleYxjzrq,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handleProcess != null" >
+        handle_process = #{handleProcess,jdbcType=VARCHAR},
+      </if>
+      <if test="handleCreateBy != null" >
+        handle_createby = #{handleCreateBy},
+      </if>
+      <if test="handleCreateTime != null" >
+        handle_createtime = #{handleCreateTime},
+      </if>
+      <if test="handleNoticePerson != null" >
+        handle_notice_person = #{handleNoticePerson},
+      </if>
+      <if test="handleName != null" >
+        handle_name = #{handleName},
+      </if>
+      <if test="handleSceneFile != null" >
+        handle_scene_file = #{handleSceneFile},
+      </if>
+      <if test="handleIdentityFile != null" >
+        handle_identity_file = #{handleIdentityFile},
+      </if>
+      <if test="handleCompateResult != null" >
+        handle_compateResult = #{handleCompateResult},
+      </if>
+    </set>
+    where handle_id = #{handleId,jdbcType=VARCHAR}
+  </update>
+
+</mapper>

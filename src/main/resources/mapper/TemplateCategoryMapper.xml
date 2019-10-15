@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.penghao.TemplateCategoryMapper" >
+  <resultMap id="BaseResultMap" type="com.ztgeo.general.entity.service_data.pub_data.TemplateCategory" >
+    <id column="template_id" property="templateId" jdbcType="VARCHAR" />
+    <result column="template_model" property="templateModel" jdbcType="VARCHAR" />
+    <result column="template_large" property="templateLarge" jdbcType="VARCHAR" />
+    <result column="template_largename" property="templateLargeName"/>
+    <result column="template_createby" property="templateCreateby" jdbcType="VARCHAR" />
+    <result column="template_createtime" property="templateCreatetime" jdbcType="TIMESTAMP" />
+    <result column="template_process" property="templateProcess" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    template_id, template_model, template_large, template_createby, template_createtime,template_largename,template_process
+  </sql>
+  <select id="findTemplateByModel" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from sj_template_category
+    where template_model = #{templateId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from sj_template_category
+    where template_id = #{templateId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByModel" parameterType="java.lang.String">
+    delete from sj_template_category
+    where template_model = #{mid}
+  </delete>
+
+  <insert id="insert" parameterType="com.ztgeo.general.entity.service_data.pub_data.TemplateCategory" >
+    insert into sj_template_category (template_id, template_model, template_large, 
+      template_createby, template_createtime)
+    values (#{templateId,jdbcType=VARCHAR}, #{templateModel,jdbcType=VARCHAR}, #{templateLarge,jdbcType=VARCHAR}, 
+      #{templateCreateby,jdbcType=VARCHAR}, #{templateCreatetime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.TemplateCategory" >
+    insert into sj_template_category
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="templateId != null" >
+        template_id,
+      </if>
+      <if test="templateModel != null" >
+        template_model,
+      </if>
+      <if test="templateLarge != null" >
+        template_large,
+      </if>
+      <if test="templateCreateby != null" >
+        template_createby,
+      </if>
+      <if test="templateCreatetime != null" >
+        template_createtime,
+      </if>
+      <if test="templateLargeName != null">
+        template_largename,
+      </if>
+      <if test="templateProcess != null">
+        template_process,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="templateId != null" >
+        #{templateId,jdbcType=VARCHAR},
+      </if>
+      <if test="templateModel != null" >
+        #{templateModel,jdbcType=VARCHAR},
+      </if>
+      <if test="templateLarge != null" >
+        #{templateLarge,jdbcType=VARCHAR},
+      </if>
+      <if test="templateCreateby != null" >
+        #{templateCreateby,jdbcType=VARCHAR},
+      </if>
+      <if test="templateCreatetime != null" >
+        #{templateCreatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="templateLargeName != null">
+        #{templateLargeName},
+      </if>
+      <if test="templateProcess != null">
+        #{templateProcess},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.TemplateCategory" >
+    update sj_template_category
+    <set >
+      <if test="templateModel != null" >
+        template_model = #{templateModel,jdbcType=VARCHAR},
+      </if>
+      <if test="templateLarge != null" >
+        template_large = #{templateLarge,jdbcType=VARCHAR},
+      </if>
+      <if test="templateCreateby != null" >
+        template_createby = #{templateCreateby,jdbcType=VARCHAR},
+      </if>
+      <if test="templateCreatetime != null" >
+        template_createtime = #{templateCreatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="templateProcess != null">
+        template_process = #{templateProcess},
+      </if>
+    </set>
+    where template_id = #{templateId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ztgeo.general.entity.service_data.pub_data.TemplateCategory" >
+    update sj_template_category
+    set template_model = #{templateModel,jdbcType=VARCHAR},
+      template_large = #{templateLarge,jdbcType=VARCHAR},
+      template_createby = #{templateCreateby,jdbcType=VARCHAR},
+      template_createtime = #{templateCreatetime,jdbcType=TIMESTAMP}
+    where template_id = #{templateId,jdbcType=VARCHAR}
+  </update>
+</mapper>

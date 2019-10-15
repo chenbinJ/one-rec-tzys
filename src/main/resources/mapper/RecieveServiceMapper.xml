@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ztgeo.general.mapper.chenbin.RecieveServiceMapper">
+
+    <resultMap id="actStep" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Act_Step">
+        <result column="step_id" property="stepId"></result>
+        <result column="step_mould_id" property="stepMouldId"></result>
+        <result column="step_mould_name" property="stepMouldName"></result>
+        <result column="step_show_name" property="stepShowName"></result>
+        <result column="step_type" property="stepType"></result>
+        <result column="process_mould_id" property="processMouldId"></result>
+        <result column="stepExt1" property="ext1"></result>
+        <result column="stepExt2" property="ext2"></result>
+        <collection property="servicePowerVoList" ofType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Service">
+            <result column="ssPowerId" property="powerId"></result>
+            <result column="ssPowerTitle" property="powerTitle"></result>
+            <result column="ssPowerNode" property="powerNode"></result>
+            <result column="ssPowerLevel" property="permissionLevel"></result>
+            <result column="deal_order" property="dealOrder"></result>
+            <association property="service" javaType="com.ztgeo.general.entity.service_data.pub_data.SJ_Service">
+                <result column="svrId" property="serviceId"></result>
+                <result column="svrName" property="serviceName"></result>
+                <result column="svrTitle" property="serviceTitle"></result>
+                <result column="svrType" property="serviceType"></result>
+                <result column="svrToTables" property="serviceDataTo"></result>
+                <result column="svrCode" property="serviceCode"></result>
+                <result column="svrExt1" property="ext1"></result>
+                <result column="svrExt2" property="ext2"></result>
+            </association>
+        </collection>
+        <collection property="interfacePowerVoList" ofType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Interface">
+            <result column="siPowerId" property="powerId"></result>
+            <result column="siPowerTitle" property="powerTitle"></result>
+            <result column="siPowerNode" property="powerNode"></result>
+            <result column="siExt1" property="ext1"></result>
+            <result column="siExt2" property="ext2"></result>
+            <association property="interfacer" javaType="com.ztgeo.general.entity.service_data.pub_data.SJ_Interface">
+                <result column="intfId" property="interfaceId"></result>
+                <result column="intfCode" property="interfaceCode"></result>
+                <result column="intfName" property="interfaceName"></result>
+                <result column="intfURL" property="interfaceURL"></result>
+                <result column="intfReqMethod" property="reqMethod"></result>
+                <result column="intfUse" property="interfaceUse"></result>
+                <result column="intfProUnit" property="provideUnit"></result>
+                <result column="intfExt1" property="ext1"></result>
+                <result column="intfExt2" property="ext2"></result>
+            </association>
+        </collection>
+    </resultMap>
+    <select id="selectActInfoByStepId" resultType="java.lang.String" resultMap="actStep">
+        SELECT
+        step.step_id,
+        step.step_mould_id,
+        step.step_mould_name,
+        step.step_show_name,
+        step.step_type,
+        step.process_mould_id,
+        step.ext1 stepExt1,
+        step.ext2 stepExt2,
+        stepSvr.power_id ssPowerId,
+        stepSvr.power_title ssPowerTitle,
+        stepSvr.power_node ssPowerNode,
+        stepSvr.permission_level ssPowerLevel,
+        stepSvr.deal_order deal_order,
+        svr.service_id svrId,
+        svr.service_name svrName,
+        svr.service_title svrTitle,
+        svr.service_type svrType,
+        svr.service_data_to svrToTables,
+        svr.service_code svrCode,
+        svr.ext1 svrExt1,
+        svr.ext2 svrExt2,
+	    stepIntf.power_id siPowerId,
+	    stepIntf.power_title siPowerTitle,
+	    stepIntf.power_node siPowerNode,
+	    stepIntf.ext1 siExt1,
+	    stepIntf.ext2 siExt2,
+	    intf.interface_id intfId,
+	    intf.interface_code intfCode,
+	    intf.interface_name intfName,
+	    intf.interface_url intfURL,
+	    intf.req_method intfReqMethod,
+	    intf.interface_use intfUse,
+	    intf.provide_unit intfProUnit,
+	    intf.ext1 intfExt1,
+	    intf.ext2 intfExt2
+        FROM
+        sj_act_step step
+        LEFT JOIN sj_power_step_service stepSvr ON step.step_id = stepSvr.step_id
+        LEFT JOIN sj_service svr ON stepSvr.service_id = svr.service_id
+        LEFT JOIN sj_power_step_interface stepIntf ON step.step_id = stepIntf.step_id
+        LEFT JOIN sj_interface intf ON stepIntf.interface_id = intf.interface_id
+        WHERE
+        step.step_id = #{stepId}
+        AND ifnull(step.`status`, '可用') = '可用'
+        AND ifnull(stepSvr.`status`, '可用') = '可用'
+        AND (
+        stepSvr.enable_time IS NULL
+        OR <![CDATA[stepSvr.enable_time  < SYSDATE() ]]>
+        )
+        AND ifnull(svr.`status`, '可用') = '可用'
+        AND ifnull(stepIntf.`status`, '可用') = '可用'
+        AND (
+        stepIntf.enable_time IS NULL
+        OR <![CDATA[stepIntf.enable_time < SYSDATE() ]]>
+        )
+        AND ifnull(intf.`status`, '可用') = '可用'
+        order by stepSvr.deal_order asc
+    </select>
+</mapper>

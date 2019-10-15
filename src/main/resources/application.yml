@@ -1,0 +1,146 @@
+
+server:
+  port: 7780
+  max-http-header-size: 4048576
+spring:
+  redis:
+    password: ztgeoredis
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  application:
+    name: wh-ztgeo-rec-project-tzys
+  main:
+    allow-bean-definition-overriding: true
+  thymeleaf:
+    enabled: true
+    encoding: UTF-8
+    mode: HTML5
+    prefix: classpath:templates/
+    suffix: .html
+  datasource:
+    druid:
+      stat-view-servlet:
+        login-username: test
+        login-password: test
+
+    dynamic:
+      druid:
+        filters: stat
+        maxActive: 20
+        initialSize: 1
+        maxWait: 60000
+        minIdle: 1
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: select 'x' from dual
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxOpenPreparedStatements: 20
+      datasource:
+        admin:
+          url: jdbc:mysql://10.3.2.147:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          username: consignee
+          password: ztgeo
+          driver-class-name: com.mysql.jdbc.Driver
+          druid: #这里可以重写默认值
+            initial-size: 6
+#        auth:
+#          url: jdbc:mysql://172.18.0.147:3306/ag-auth?useUnicode=true&characterEncoding=UTF8&useSSL=true
+#          username: consignee
+#          password: ztgeo
+#          driver-class-name: com.mysql.jdbc.Driver
+#          druid:
+#            initial-size: 6
+      primary: admin
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: non_null
+
+jwt:  #jwt生成相关秘钥
+  token-header: Authorization
+  expire: 3600
+  rsa-secret: xx1WET12^%3^(WE45
+  user-service: ace-admin
+
+url:
+  ignore: /jwt/**,/webjars/**,/processes/**,/swagger-ui.html,/swagger-resources/**,/api/customDict/**,/api/test/**,/cache/**,/cache.**,/activity/**,/activity/modeler.html,/service/model/**,/service/editor/**  # ,/api/sysManager/**,/api/biz/**暂时将swagger解开限制
+
+auth:
+  serviceId: ace-auth
+  user:
+    token-header: Authorization
+    limit-expire: 1440 # 一天过去,单位分钟
+msi:
+  url: C:\Setup\Setup.rar
+
+redis:
+  aec-key: xx288&^^%$!@#4dc  #用于redis key的加解密操作 防止共秘钥被破解
+  aec-iv: 0123456789abcdef
+  pool:
+    maxActive: 300
+    maxIdle: 100
+    maxWait: 1000
+  host: 127.0.0.1
+  port: 6379
+#  password: ztgeoredis
+  timeout: 2000
+  sysName: ace-pubserver
+  enable: true
+  database: 0
+# 配置数据库
+mybatis:
+  mapper-locations: "classpath*:mapper/*.xml"
+  configuration:
+    map-underscore-to-camel-case: true
+# 配置swagger
+swagger:
+  enabled: true
+  base-package: com.ztgeo.general
+  title: wh-ztgeo-rec-project-tzys
+  version: 1.0.0.SNAPSHOT
+  description: 一窗受理-泰州演示
+  contact:
+    name: wei
+
+#jasypt:
+#  encryptor:
+#    password: BdaObXaELAA
+special:
+  admin: admin
+
+webplus:
+  ftpAddress: 10.3.2.203
+  ftpPort: 21
+  ftpUsername: forftp
+  ftpPassword: 123456
+
+entry:
+  comparison: 身份证照片附件
+logging:
+  level:
+    com.ztgeo.general: debug
+
+# 跨服务数据合并 用于允许 字段的获取方式
+merge:
+  enabled: true
+  guavaCacheNumMaxSize: 1000
+  guavaCacheRefreshWriteTime: 10 # min
+  guavaCacheRefreshThreadPoolSize: 10
+  aop:
+    enabled: true
+
+mapper:
+  mappers: com.github.wxiaoqi.security.common.mapper.CommonMapper
+
+dataService:
+  codeAndDataToMapper: TaxationReceiptService$qsxx,MortgageContractReceiptService$dyhtxx,TransactionContractReceiptService$jyhtxx,ImmovableRightReceiptService$bdcqlxgxx,ImmovableMortgageReceiptService$bdcdyxgxx
+receipt:
+  sequentName: mySequence
+  qrImgUrl: D:/ycsl/img/qrImg/            #收件单打印的二维码路径
+  departImgUrl: D:/ycsl/img/departImg/    #部门证件照片的存放路径
+  folderPath: D:/file/                    #PDF生成的根目录
+
+

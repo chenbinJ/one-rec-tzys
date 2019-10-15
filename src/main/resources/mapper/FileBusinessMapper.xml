@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.chenbin.FileBusinessMapper">
+    <resultMap id="fjInstMap" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjinst"></resultMap>
+    <resultMap id="fjFileMap" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjfile"></resultMap>
+    <select id="selectAllFjinstByProcInst" parameterType="java.lang.String" resultMap="fjInstMap">
+        select * from  sj_fjinst where ckind='文件' and file_id is not null and entry_id is not null and pnode=#{processInstanceId}
+    </select>
+
+    <select id="selectEntryNameById" parameterType="java.lang.String" resultType="java.lang.String">
+        select entry_name from sj_fjtm where entry_id = #{entryId}
+    </select>
+
+    <select id="selectFileByFileId" parameterType="java.lang.String" resultMap="fjFileMap">
+        select * from sj_fjfile where file_id = #{fileId}
+    </select>
+</mapper>

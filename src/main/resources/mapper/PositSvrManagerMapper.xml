@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ztgeo.general.mapper.chenbin.PositSvrManagerMapper">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Service_Position" id="SJ_Power_Service_PositionMap"></resultMap>
+
+    <delete id="deletePositSvrByParam">
+        delete from sj_power_service_position
+        <where>
+          <if test="serviceId!=null and serviceId!=''">
+              and service_id = #{serviceId}
+          </if>
+          <if test="positionId!=null and positionId!=''">
+              and position_id = #{positionId}
+          </if>
+          or 1=0
+        </where>
+    </delete>
+    <select id="selectCountOfPositSvrSame" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Service_Position" resultType="int">
+        select count(*) from sj_power_service_position where service_id = #{serviceId} and position_id = #{positionId}
+    </select>
+    <select id="selectPositionSvr" resultMap="SJ_Power_Service_PositionMap">
+        select * from sj_power_service_position t1 inner join sj_service t2 on t1.service_id = t2.service_id where t1.position_id=#{positionId} and t2.service_code = #{serviceCode}
+    </select>
+</mapper>

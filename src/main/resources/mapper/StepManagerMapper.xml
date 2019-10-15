@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.chenbin.StepManagerMapper">
+    <delete id="deleteStepSvrByParam">
+      delete from sj_power_step_service
+        <where>
+            <if test="powerId!=null and powerId!=''">
+                and power_id = #{powerId}
+            </if>
+            <if test="stepId!=null and stepId!=''">
+                and step_id = #{stepId}
+            </if>
+            <if test="svrId!=null and svrId!=''">
+                and service_id = #{svrId}
+            </if>
+            or 1 =0
+        </where>
+    </delete>
+    <delete id="deleteStepIntfByParam">
+        delete from sj_power_step_interface
+        <where>
+            <if test="powerId!=null and powerId!=''">
+                and power_id = #{powerId}
+            </if>
+            <if test="stepId!=null and stepId!=''">
+                and step_id = #{stepId}
+            </if>
+            <if test="intfId!=null and intfId!=''">
+                and interface_id = #{intfId}
+            </if>
+            or 1 =0
+        </where>
+    </delete>
+    <delete id="deleteStepPositionByParam">
+        delete from sj_power_step_position
+        <where>
+            <if test="powerId!=null and powerId!=''">
+                and power_id = #{powerId}
+            </if>
+            <if test="stepId!=null and stepId!=''">
+                and step_id = #{stepId}
+            </if>
+            <if test="positionId!=null and positionId!=''">
+                and position_id = #{positionId}
+            </if>
+            or 1 =0
+        </where>
+    </delete>
+
+    <update id="updateStepStatus">
+        update sj_act_step set status=#{status,jdbcType=VARCHAR} where step_id = #{stepId}
+    </update>
+    <update id="updateRelationStatusByProsId">
+        update sj_act_step_gl set status=#{status,jdbcType=VARCHAR} where process_mould_id = #{processId}
+    </update>
+    <delete id="deleteStepRelationByProsId" parameterType="java.lang.String">
+        delete from sj_act_step_gl where process_mould_id = #{processId}
+    </delete>
+    <select id="selectStepIdsByProcessId" parameterType="java.lang.String" resultType="java.lang.String">
+        select step_id from sj_act_step where process_mould_id = #{processId}
+    </select>
+    <delete id="deleteStepByStepId" parameterType="java.lang.String">
+        delete from sj_act_step where step_id = #{stepId}
+    </delete>
+    <insert id="insertStep" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Act_Step">
+        insert into sj_act_step(
+          step_id,step_mould_id,step_mould_name,step_show_name,
+          step_type,parent_step_mould_id,process_mould_id,
+          alarm_term,overdue_term,status,ext1,ext2
+        )values(
+          #{stepId},#{stepMouldId},#{stepMouldName},#{stepShowName},#{stepType},
+          #{parentStepMouldId,jdbcType=VARCHAR},#{processMouldId},
+          #{alarmTerm,jdbcType=VARCHAR},#{overdueTerm,jdbcType=VARCHAR},
+          #{status,jdbcType=VARCHAR},#{ext1,jdbcType=VARCHAR},#{ext2,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertStepRelation" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Act_Step_Gl">
+        insert into sj_act_step_gl(
+          relation_id,parent_step_id,
+          child_step_id,process_mould_id,status
+        ) values (
+          #{relationId},#{parentStepId},#{childStepId},
+          #{processMouldId},#{status,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="updateStep" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Act_Step">
+        update
+          sj_act_step
+        set
+          step_show_name = #{stepShowName,jdbcType=VARCHAR},
+          alarm_term = #{alarmTerm,jdbcType=VARCHAR},
+          overdue_term = #{overdueTerm,jdbcType=VARCHAR},
+          ext1 = #{ext1,jdbcType=VARCHAR},
+          ext2 = #{ext2,jdbcType=VARCHAR}
+        where
+          step_id = #{stepId}
+    </update>
+
+    <resultMap id="steps" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Act_Step"></resultMap>
+    <select id="selectStepsByProcessId" parameterType="java.lang.String" resultMap="steps">
+        select
+           step_id,
+           step_mould_id,
+           step_mould_name,
+           step_show_name,
+           step_type,
+           parent_step_mould_id,
+           process_mould_id,
+           alarm_term,
+           overdue_term,
+           ifnull(status,'可用') status,
+           ext1,
+           ext2
+        from sj_act_step
+        where process_mould_id = #{processId}
+    </select>
+
+    <select id="findStartModuleIdByStep" resultMap="steps">
+         select
+           step_id,
+           step_mould_id,
+           step_mould_name,
+           step_show_name,
+           step_type,
+           parent_step_mould_id,
+           process_mould_id,
+           alarm_term,
+           overdue_term,
+           ifnull(status,'可用') status,
+           ext1,
+           ext2
+        from sj_act_step
+        where process_mould_id = #{processId} and step_mould_id='start'
+    </select>
+
+    <select id="selectStepByMouldId" resultMap="steps">
+          select
+           step_id,
+           step_mould_id,
+           step_mould_name,
+           step_show_name,
+           step_type,
+           parent_step_mould_id,
+           process_mould_id,
+           alarm_term,
+           overdue_term,
+           ifnull(status,'可用') status,
+           ext1,
+           ext2
+        from sj_act_step
+        where step_mould_id = #{moduleId}
+        and ifnull(status,'可用') = '可用'
+    </select>
+
+
+    <select id="findStepByModuleId" resultMap="steps">
+        SELECT sas.* from sj_act_step sas
+        LEFT JOIN sj_act_step_gl gl
+        ON sas.step_id=gl.child_step_id
+        WHERE gl.parent_step_id in
+    (
+        (select asa.step_id from sj_act_step asa WHERE asa.process_mould_id=#{moduleId} AND asa.step_mould_id='start')
+    )
+    </select>
+
+
+    <select id="selectStepByPosition"  parameterType="java.lang.String"  resultMap="steps">
+          select
+           step.step_id,
+           step.step_mould_id,
+           step.step_mould_name,
+           step.step_show_name,
+           step.step_type,
+           step.parent_step_mould_id,
+           step.process_mould_id,
+           step.alarm_term,
+           step.overdue_term,
+           ifnull(step.status,'可用') status,
+           step.ext1,
+           step.ext2
+        from sj_act_step step
+        LEFT JOIN sj_power_step_position po
+		ON po.step_id=step.step_id
+		WHERE  po.position_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+        #{item}
+        </foreach>
+        and (po.permission_level='Write' OR po.permission_level='WriteIfNull') and step.step_mould_id='start'
+    </select>
+
+
+
+    <select id="selectStepByStepId" parameterType="java.lang.String" resultMap="steps">
+        select
+           step_id,
+           step_mould_id,
+           step_mould_name,
+           step_show_name,
+           step_type,
+           parent_step_mould_id,
+           process_mould_id,
+           alarm_term,
+           overdue_term,
+           ifnull(status,'可用') status,
+           ext1,
+           ext2
+        from sj_act_step
+        where step_id = #{stepId}
+    </select>
+
+    <resultMap id="stepgls" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Act_Step_Gl"></resultMap>
+    <select id="selectStepGlsByProcessId" parameterType="java.lang.String" resultMap="stepgls">
+        select
+         relation_id,
+         parent_step_id,
+         child_step_id,
+         process_mould_id,
+         ifnull(status,'可用') status
+        from sj_act_step_gl
+        where process_mould_id = #{processId}
+    </select>
+
+    <!-- 查询步骤接口权限列表 -->
+    <resultMap id="stepIntfs" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Interface"></resultMap>
+    <select id="selectStepIntfs" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Interface" resultMap="stepIntfs">
+        select
+          *
+        from sj_power_step_interface
+        <where>
+            <if test="stepId!=null and stepId!=''">
+                and step_id = #{stepId}
+            </if>
+            <if test="status!=null and status!=''">
+                and ifnull(status,'可用') = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="findstepIntfsByStepId" resultMap="stepIntfs">
+        select * from
+        sj_power_step_interface
+        where 1=1
+                and step_id = #{stepId} and ifnull(status,'可用')='可用'
+                and set_up = '自动'
+    </select>
+
+
+    <resultMap id="stepSvrs" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Service"></resultMap>
+    <select id="selectStepSvrs" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Service" resultMap="stepSvrs">
+        select
+          *
+        from sj_power_step_service
+        <where>
+          <if test="stepId!=null and stepId!=''">
+            and step_id = #{stepId}
+          </if>
+          <if test="status!=null and status!=''">
+            and ifnull(status,'可用') = #{status}
+          </if>
+        </where>
+        order by deal_order asc
+    </select>
+    <resultMap id="stepPositions" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Position"></resultMap>
+    <select id="selectStepPositions" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Position" resultMap="stepPositions">
+        select
+          *
+        from sj_power_step_position
+        <where>
+          <if test="stepId!=null and stepId!=''">
+            and step_id = #{stepId}
+          </if>
+          <if test="status!=null and status!=''">
+            and ifnull(status,'可用') = #{status}
+          </if>
+        </where>
+    </select>
+
+    <select id="selectStepIntfByPowerId" parameterType="java.lang.String" resultMap="stepIntfs">
+        select * from sj_power_step_interface
+        where power_id = #{powerId} and ifnull(status,'可用')='可用'
+    </select>
+    <select id="selectStepSvrByPowerId" parameterType="java.lang.String" resultMap="stepSvrs">
+        select * from sj_power_step_service where power_id = #{powerId}
+    </select>
+    <select id="selectStepPositionByPowerId" parameterType="java.lang.String" resultMap="stepPositions">
+        select * from sj_power_step_position where power_id = #{powerId}
+    </select>
+
+    <insert id="insertStepIntf" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Interface">
+        insert into sj_power_step_interface(
+          power_id,
+          power_title,
+          power_node,
+          step_id,
+          interface_id,
+          create_by,
+          create_time,
+          <if test="enableTime!=null and enableTime!=''">
+            enable_time,
+          </if>
+          status,
+          ext1,
+          ext2,
+          set_up
+        ) values (
+          #{powerId},
+          #{powerTitle},
+          #{powerNode},
+          #{stepId},
+          #{interfaceId},
+          #{createBy},
+          str_to_date(#{createTime}, '%Y-%m-%d %H:%i:%s'),
+          <if test="enableTime!=null and enableTime!=''">
+              str_to_date(#{enableTime}, '%Y-%m-%d %H:%i:%s'),
+          </if>
+          #{status},
+          #{ext1},
+          #{ext2},
+          #{setUp,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertStepSvr" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Service">
+        insert into sj_power_step_service(
+        power_id,
+        power_title,
+        power_node,
+        step_id,
+        service_id,
+        permission_level,
+        create_by,
+        create_time,
+        <if test="enableTime!=null and enableTime!=''">
+            enable_time,
+        </if>
+        status,
+        deal_order
+        ) values (
+        #{powerId},
+        #{powerTitle},
+        #{powerNode},
+        #{stepId},
+        #{serviceId},
+        #{permissionLevel},
+        #{createBy},
+        str_to_date(#{createTime}, '%Y-%m-%d %H:%i:%s'),
+        <if test="enableTime!=null and enableTime!=''">
+            str_to_date(#{enableTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        #{status},
+        #{dealOrder}
+        )
+    </insert>
+    <insert id="insertStepPosition" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Position">
+        insert into sj_power_step_position(
+        power_id,
+        power_title,
+        power_node,
+        step_id,
+        position_id,
+        permission_level,
+        create_by,
+        create_time,
+        <if test="enableTime!=null and enableTime!=''">
+            enable_time,
+        </if>
+        status
+        ) values (
+        #{powerId},
+        #{powerTitle},
+        #{powerNode},
+        #{stepId},
+        #{positionId},
+        #{permissionLevel},
+        #{createBy},
+        str_to_date(#{createTime}, '%Y-%m-%d %H:%i:%s'),
+        <if test="enableTime!=null and enableTime!=''">
+            str_to_date(#{enableTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+        #{status}
+        )
+    </insert>
+    <update id="updateStepIntf" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Interface">
+        update
+          sj_power_step_interface
+        set
+          power_title = #{powerTitle,jdbcType=VARCHAR},
+          power_node = #{powerNode,jdbcType=VARCHAR},
+          interface_id = #{interfaceId},
+        <if test="enableTime!=null and enableTime!=''">
+          enable_time = str_to_date(#{enableTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+          status = #{status,jdbcType=VARCHAR},
+          ext1 = #{ext1,jdbcType=VARCHAR},
+          ext2 = #{ext2,jdbcType=VARCHAR},
+          set_up = #{setUp,jdbcType=VARCHAR}
+        where power_id=#{powerId}
+    </update>
+    <update id="updateStepSvr" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Service">
+        update
+          sj_power_step_service
+        set
+          power_title = #{powerTitle,jdbcType=VARCHAR},
+          power_node = #{powerNode,jdbcType=VARCHAR},
+          service_id = #{serviceId},
+          permission_level = #{permissionLevel},
+        <if test="enableTime!=null and enableTime!=''">
+            enable_time = str_to_date(#{enableTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+          status = #{status,jdbcType=VARCHAR},
+          deal_order = #{dealOrder}
+        where power_id=#{powerId}
+    </update>
+    <update id="updateStepPosition" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Position">
+        update
+          sj_power_step_position
+        set
+          power_title = #{powerTitle,jdbcType=VARCHAR},
+          power_node = #{powerNode,jdbcType=VARCHAR},
+          position_id = #{positionId},
+          permission_level = #{permissionLevel},
+        <if test="enableTime!=null and enableTime!=''">
+            enable_time = str_to_date(#{enableTime}, '%Y-%m-%d %H:%i:%s'),
+        </if>
+          status = #{status,jdbcType=VARCHAR}
+        where power_id=#{powerId}
+    </update>
+    <select id="selectCountOfStepIntfSame" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Interface" resultType="int">
+        select count(*) from sj_power_step_interface where step_id = #{stepId} and interface_id = #{interfaceId}
+    </select>
+    <select id="selectCountOfStepSvrSame" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Service" resultType="int">
+        select count(*) from sj_power_step_service where step_id = #{stepId} and service_id = #{serviceId}
+    </select>
+    <select id="selectCountOfStepPositionSame" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Position" resultType="int">
+        select count(*) from sj_power_step_position where step_id = #{stepId} and position_id = #{positionId}
+    </select>
+    <select id="selectStepIdByStepMouldId" parameterType="java.lang.String" resultType="java.lang.String">
+        select step_id from sj_act_step where step_mould_id = #{stepMouldId}
+    </select>
+    <select id="selectPowerLevelWithStepAndPositionId" resultType="java.lang.String">
+        select
+          permission_level
+        from sj_power_step_position
+        where
+          step_id = #{stepId}
+          and position_id=#{positId}
+          and ifnull(status,'可用')='可用'
+          and (
+            enable_time IS NULL
+            OR <![CDATA[ enable_time < SYSDATE() ]]>
+          )
+    </select>
+    <select id="selectPowerLevelWithStepAndServiceCode" resultType="java.lang.String">
+        select
+          ifnull(t1.permission_level,'ReadOnly') permission_level
+        from sj_power_step_service t1
+        inner join sj_service t2
+          on t1.service_id = t2.service_id
+        where
+          t1.step_id = #{stepId}
+          and t2.service_code = #{serviceCode}
+          and ifnull(t1.status,'可用')='可用'
+          and (
+            t1.enable_time IS NULL
+            OR <![CDATA[ t1.enable_time < SYSDATE() ]]>
+          )
+    </select>
+    <select id="selectStepIntfByThemId" resultMap="stepIntfs">
+      select * from sj_power_step_interface where step_id = #{stepId} and interface_id = #{interfaceId}
+    </select>
+</mapper>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.penghao.SjPowerStepPositionMapper" >
+  <resultMap id="BaseResultMap" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Position" >
+    <id column="power_id" property="powerId" jdbcType="VARCHAR" />
+    <result column="power_title" property="powerTitle" jdbcType="VARCHAR" />
+    <result column="position_id" property="positionId" jdbcType="VARCHAR" />
+    <result column="step_id" property="stepId" jdbcType="VARCHAR" />
+    <result column="permission_level" property="permissionLevel" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime"  />
+    <result column="enable_time" property="enableTime"  />
+    <result column="power_node" property="powerNode"  />
+    <result column="status" property="status" />
+  </resultMap>
+  <resultMap type="com.ztgeo.general.entity.Position" id="positionMap">
+  <result property="id" column="id"/>
+  <result property="name" column="name"/>
+  <result property="departId" column="depart_id"/>
+  <result property="code" column="code"/>
+  <result property="type" column="type"/>
+  <result property="crtUserName" column="crt_user_name"/>
+  <result property="crtUserId" column="crt_user_id"/>
+  <result property="crtTime" column="crt_time"/>
+  <result property="updUserName" column="upd_user_name"/>
+  <result property="updUserId" column="upd_user_id"/>
+  <result property="updTime" column="upd_time"/>
+  <result property="attr1" column="attr1"/>
+  <result property="attr2" column="attr2"/>
+  <result property="attr3" column="attr3"/>
+  <result property="attr4" column="attr4"/>
+  <result property="tenantId" column="tenant_id"/>
+</resultMap>
+  <sql id="Base_Column_List" >
+    power_id, power_title, position_id, step_id, permission_level, create_by, create_time, 
+    enable_time, status,power_node
+  </sql>
+
+  <delete id="deleteByStepId">
+      delete from sj_power_step_position
+      where step_id= #{stepId}
+  </delete>
+
+  <select id="findPowerStepByReadOnly" resultType="java.lang.Integer">
+    SELECT COUNT(1) from sj_power_step_position
+    WHERE position_id in
+    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    AND step_id = #{stepId} AND permission_level = #{permissionLevel}
+  </select>
+
+
+
+   <select id="getPositionByStepId" resultMap="BaseResultMap">
+      select powerstep.* from sj_power_step_position powerstep
+      INNER JOIN base_position position
+      on position.id=powerstep.position_id
+      WHERE powerstep.step_id = #{stepId} and powerstep.permission_level='Write'
+  </select>
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from sj_power_step_position
+    where power_id = #{powerId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Position" >
+    insert into sj_power_step_position (power_id, power_title, position_id,
+      step_id, permission_level, create_by,
+      create_time, enable_time, status,
+      power_node)
+    values (#{powerId,jdbcType=VARCHAR}, #{powerTitle,jdbcType=VARCHAR}, #{positionId,jdbcType=VARCHAR},
+      #{stepId,jdbcType=VARCHAR}, #{permissionLevel,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR},
+      #{createTime,jdbcType=TIMESTAMP}, #{enableTime,jdbcType=TIMESTAMP}, #{status,jdbcType=VARCHAR},
+      #{powerNode,jdbcType=LONGVARCHAR})
+  </insert>
+
+
+  <insert id="insertList" parameterType="java.util.List">
+    insert into sj_power_step_position (power_id, power_title, position_id,
+      step_id,permission_level,create_by,
+      create_time,enable_time, status,
+      power_node)
+    values
+    <foreach collection="list" index="index" item="item" separator=",">
+      (
+      #{item.powerId},#{item.powerTitle},#{item.positionId},#{item.stepId},
+      #{item.permissionLevel},#{item.createBy},#{item.createTime},
+      #{item.enableTime},#{item.status},#{item.powerNode}
+      )
+    </foreach>
+  </insert>
+
+
+
+
+  <insert id="insertSelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Position" >
+    insert into sj_power_step_position
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="powerId != null" >
+        power_id,
+      </if>
+      <if test="powerTitle != null" >
+        power_title,
+      </if>
+      <if test="positionId != null" >
+        position_id,
+      </if>
+      <if test="stepId != null" >
+        step_id,
+      </if>
+      <if test="permissionLevel != null" >
+        permission_level,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="enableTime != null" >
+        enable_time,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="powerNode != null" >
+        power_node,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="powerId != null" >
+        #{powerId,jdbcType=VARCHAR},
+      </if>
+      <if test="powerTitle != null" >
+        #{powerTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="positionId != null" >
+        #{positionId,jdbcType=VARCHAR},
+      </if>
+      <if test="stepId != null" >
+        #{stepId,jdbcType=VARCHAR},
+      </if>
+      <if test="permissionLevel != null" >
+        #{permissionLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="enableTime != null" >
+        #{enableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="powerNode != null" >
+        #{powerNode,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Step_Position" >
+    update sj_power_step_position
+    <set >
+      <if test="powerTitle != null" >
+        power_title = #{powerTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="positionId != null" >
+        position_id = #{positionId,jdbcType=VARCHAR},
+      </if>
+      <if test="stepId != null" >
+        step_id = #{stepId,jdbcType=VARCHAR},
+      </if>
+      <if test="permissionLevel != null" >
+        permission_level = #{permissionLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="enableTime != null" >
+        enable_time = #{enableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="powerNode != null" >
+        power_node = #{powerNode,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where power_id = #{powerId,jdbcType=VARCHAR}
+  </update>
+
+
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ztgeo.general.mapper.chenbin.InterfaceDataHandleMapper">
+    <insert id="insertInterfaceData" parameterType="com.ztgeo.general.entity.service_data.interface_response.interface_data.InterfaceData">
+        insert
+          into
+        data_interface_inst(
+          id,
+          interfaceCode,
+          serviceCode,
+          outerIdOrNo,
+          pdfPath,
+          reqParams,
+          respBody,
+          witchOuter,
+          executor,
+          checkTime,
+          status
+        )values (
+          #{id},
+          #{interfaceCode,jdbcType=VARCHAR},
+          #{serviceCode,jdbcType=VARCHAR},
+          #{outerIdOrNo,jdbcType=VARCHAR},
+          #{pdfPath,jdbcType=VARCHAR},
+          #{reqParams,jdbcType=VARCHAR},
+          #{respBody,jdbcType=VARCHAR},
+          #{witchOuter,jdbcType=VARCHAR},
+          #{executor,jdbcType=VARCHAR},
+          #{checkTime,jdbcType=VARCHAR},
+          #{status,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateInterfaceData" parameterType="com.ztgeo.general.entity.service_data.interface_response.interface_data.InterfaceData">
+        update data_interface_inst set
+          interfaceCode=#{interfaceCode,jdbcType=VARCHAR},
+          serviceCode=#{serviceCode,jdbcType=VARCHAR},
+          outerIdOrNo=#{outerIdOrNo,jdbcType=VARCHAR},
+          pdfPath=#{pdfPath,jdbcType=VARCHAR},
+          reqParams=#{reqParams,jdbcType=VARCHAR},
+          respBody=#{respBody,jdbcType=VARCHAR},
+          witchOuter=#{witchOuter,jdbcType=VARCHAR},
+          executor=#{executor,jdbcType=VARCHAR},
+          checkTime=#{checkTime,jdbcType=VARCHAR},
+          status=#{status,jdbcType=VARCHAR}
+        where id=#{id}
+    </update>
+</mapper>

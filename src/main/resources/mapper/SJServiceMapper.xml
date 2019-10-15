@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ztgeo.general.mapper.chenbin.SJServiceMapper">
+    <resultMap id="BaseResultMap" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Service">
+        <!--
+          WARNING - @mbggenerated
+        -->
+        <id column="service_id"  property="serviceId"/>
+        <result column="service_name"  property="serviceName"/>
+        <result column="service_title"  property="serviceTitle"/>
+        <result column="service_type"  property="serviceType"/>
+        <result column="classification" property="classification"/>
+        <result column="service_data_to" jdbcType="VARCHAR" property="serviceDataTo"/>
+        <result column="service_code"  property="serviceCode"/>
+        <result column="create_by"  property="createBy"/>
+        <result column="create_time"  property="createTime"/>
+        <result column="status"  property="status"/>
+        <result column="ext1"  property="ext1"/>
+        <result column="ext2"  property="ext2"/>
+
+    </resultMap>
+
+
+
+
+
+    <select id="findSjServiceByUid" resultMap="BaseResultMap">
+        select service.*
+        from sj_power_service_position serposition
+        LEFT JOIN sj_service service
+        ON service.service_id=serposition.service_id
+        LEFT JOIN base_position_user userpostion
+        ON userpostion.position_id=serposition.position_id
+        WHERE 1=1
+        AND userpostion.user_id=#{uid}
+    </select>
+
+    <select id="findAllSjServices" resultMap="BaseResultMap">
+        select service.* from sj_service service where ifnull(service.status,'可用') = '可用' and ifnull(classification,'INNER_SERVICE') = 'OUTER_SERVICE'
+    </select>
+
+
+</mapper>

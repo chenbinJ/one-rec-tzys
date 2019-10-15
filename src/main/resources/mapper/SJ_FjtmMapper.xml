@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.penghao.SJ_FjtmMapper" >
+  <resultMap id="BaseResultMap" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjtm" >
+    <id column="entry_id" property="entryId" jdbcType="VARCHAR" />
+    <result column="entry_name" property="entryName" jdbcType="VARCHAR" />
+    <result column="mapping_name" property="mappingName" jdbcType="VARCHAR" />
+    <result column="process_mould_id" property="processMouldId" jdbcType="VARCHAR" />
+    <result column="entry_type" property="entryType" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="last_update" property="lastUpdate" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="ext1" property="ext1" jdbcType="VARCHAR" />
+    <result column="ext2" property="ext2" jdbcType="VARCHAR" />
+    <result column="node" property="node" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    entry_id, entry_name, mapping_name, process_mould_id, entry_type, create_by, create_time, last_update,
+    status, ext1, ext2,node
+  </sql>
+
+  <select id="findFjtmByAdmin" resultType="com.ztgeo.general.entity.extend.Fjtm_Power">
+      select fjtm.entry_id as entryId,fjtm.entry_name as entryName,fjtm.process_mould_id as processModuleId,
+			 fjtm.node as node,fjtm.entry_type as entryType
+      from sj_fjtm fjtm
+      WHERE fjtm.process_mould_id = #{mid}
+  </select>
+
+
+  <select id="findFjtmPowerByPosition" resultType="com.ztgeo.general.entity.extend.Fjtm_Power">
+      select fjtm.entry_id as entryId,fjtm.entry_name as entryName,fjtm.process_mould_id as processModuleId,
+			 fjtm.node as node,fjtm.entry_type as entryType,power.power_id as powerId,power.power_title as powerTitle,
+			 power.isnecessary,power.permission_level as permissionLevel,power.power_node as powerNode
+      from sj_fjtm fjtm
+      INNER JOIN  sj_power_fjtm_position power
+      on fjtm.entry_id=power.entry_id
+      WHERE fjtm.process_mould_id = #{mid}
+      <if test="null != list and list.size != 0">
+      and power.position_id in
+      <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+      </if>
+      GROUP BY fjtm.entry_id
+  </select>
+
+
+  <select id="selectByMid" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from sj_fjtm
+    where process_mould_id=#{mid}
+  </select>
+
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from sj_fjtm
+    where entry_id = #{entryId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from sj_fjtm
+    where entry_id = #{entryId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjtm" >
+    insert into sj_fjtm (entry_id, entry_name, process_mould_id,
+      entry_type, create_by, create_time,
+      last_update, status, ext1,
+      ext2, node)
+    values (#{entryId,jdbcType=VARCHAR}, #{entryName,jdbcType=VARCHAR}, #{processMouldId,jdbcType=VARCHAR},
+      #{entryType,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+      #{lastUpdate,jdbcType=TIMESTAMP}, #{status,jdbcType=VARCHAR}, #{ext1,jdbcType=VARCHAR},
+      #{ext2,jdbcType=VARCHAR}, #{node,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjtm" >
+    insert into sj_fjtm
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="entryId != null" >
+        entry_id,
+      </if>
+      <if test="entryName != null" >
+        entry_name,
+      </if>
+      <if test="processMouldId != null" >
+        process_mould_id,
+      </if>
+      <if test="entryType != null" >
+        entry_type,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="lastUpdate != null" >
+        last_update,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="ext1 != null" >
+        ext1,
+      </if>
+      <if test="ext2 != null" >
+        ext2,
+      </if>
+      <if test="node != null" >
+        node,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="entryId != null" >
+        #{entryId,jdbcType=VARCHAR},
+      </if>
+      <if test="entryName != null" >
+        #{entryName,jdbcType=VARCHAR},
+      </if>
+      <if test="processMouldId != null" >
+        #{processMouldId,jdbcType=VARCHAR},
+      </if>
+      <if test="entryType != null" >
+        #{entryType,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdate != null" >
+        #{lastUpdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="ext1 != null" >
+        #{ext1,jdbcType=VARCHAR},
+      </if>
+      <if test="ext2 != null" >
+        #{ext2,jdbcType=VARCHAR},
+      </if>
+      <if test="node != null" >
+        #{node,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjtm" >
+    update sj_fjtm
+    <set >
+      <if test="entryName != null" >
+        entry_name = #{entryName,jdbcType=VARCHAR},
+      </if>
+      <if test="processMouldId != null" >
+        process_mould_id = #{processMouldId,jdbcType=VARCHAR},
+      </if>
+      <if test="entryType != null" >
+        entry_type = #{entryType,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdate != null" >
+        last_update = #{lastUpdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="ext1 != null" >
+        ext1 = #{ext1,jdbcType=VARCHAR},
+      </if>
+      <if test="ext2 != null" >
+        ext2 = #{ext2,jdbcType=VARCHAR},
+      </if>
+      <if test="node != null" >
+        node = #{node,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where entry_id = #{entryId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjtm" >
+    update sj_fjtm
+    set entry_name = #{entryName,jdbcType=VARCHAR},
+      process_mould_id = #{processMouldId,jdbcType=VARCHAR},
+      entry_type = #{entryType,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      last_update = #{lastUpdate,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=VARCHAR},
+      ext1 = #{ext1,jdbcType=VARCHAR},
+      ext2 = #{ext2,jdbcType=VARCHAR},
+      node = #{node,jdbcType=LONGVARCHAR}
+    where entry_id = #{entryId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjtm" >
+    update sj_fjtm
+    set entry_name = #{entryName,jdbcType=VARCHAR},
+      process_mould_id = #{processMouldId,jdbcType=VARCHAR},
+      entry_type = #{entryType,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      last_update = #{lastUpdate,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=VARCHAR},
+      ext1 = #{ext1,jdbcType=VARCHAR},
+      ext2 = #{ext2,jdbcType=VARCHAR}
+    where entry_id = #{entryId,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ztgeo.general.mapper.chenbin.RecordHandleMapper">
+    <insert id="insertRecord" parameterType="com.ztgeo.general.entity.service_data.interface_response.Sj_Inquiry_Record">
+        insert into sj_inquiry_record (
+          record_id,
+          record_title,
+          interface_code,
+          service_code,
+          return_data,
+          executor,
+          execution_time,
+          applicant,
+          IDNumber,
+          pdf_path
+        ) values (
+          #{recordId},
+          #{recordTitle,jdbcType=VARCHAR},
+          #{interfaceCode,jdbcType=VARCHAR},
+          #{serviceCode,jdbcType=VARCHAR},
+          #{returnData,jdbcType=VARCHAR},
+          #{executor,jdbcType=VARCHAR},
+          str_to_date(#{executionTime}, '%Y-%m-%d %H:%i:%s'),
+          #{applicant,jdbcType=VARCHAR},
+          #{IDNumber,jdbcType=VARCHAR},
+          #{pdfPath,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="insertRecordExt" parameterType="com.ztgeo.general.entity.service_data.interface_response.Sj_Inquiry_Record_Ext">
+        insert into sj_inquiry_record_ext (
+          ext_id,
+          record_id,
+          params_id,
+          ext_key,
+          ext_name,
+          ext_value,
+          isFile,
+          if_file_sort
+        ) values (
+          #{extId},
+          #{recordId,jdbcType=VARCHAR},
+          #{paramsId,jdbcType=VARCHAR},
+          #{extKey,jdbcType=VARCHAR},
+          #{extName,jdbcType=VARCHAR},
+          #{extValue,jdbcType=VARCHAR},
+          #{isFile,jdbcType=VARCHAR},
+          #{ifFileSort,jdbcType=INTEGER}
+        )
+    </insert>
+
+    <resultMap id="recordMap1" type="com.ztgeo.general.entity.service_data.interface_response.Sj_Inquiry_Record">
+        <result column="record_id" property="recordId"></result>
+        <result column="record_title" property="recordTitle"></result>
+        <result column="service_code" property="serviceCode"></result>
+        <result column="executor" property="executor"></result>
+        <result column="execution_time" property="executionTime"></result>
+        <result column="applicant" property="applicant"></result>
+        <result column="IDNumber" property="IDNumber"></result>
+    </resultMap>
+
+    <select id="selectRecords" parameterType="com.ztgeo.general.entity.service_data.sys_data.RecordSearchParams" resultMap="recordMap1">
+        SELECT
+	      record_id,
+	      record_title,
+	      service_code,
+	      executor,
+	      execution_time,
+          applicant,
+          IDNumber
+        FROM
+	      sj_inquiry_record t1
+	    <where>
+            1=1
+            <if test="recordTitle!=null and recordTitle!=''">
+                and t1.record_title like CONCAT('%',#{recordTitle},'%')
+            </if>
+            <if test="serviceCode!=null and serviceCode!=''">
+                and t1.service_code = #{serviceCode}
+            </if>
+            <if test="executor!=null and executor!=''">
+                and t1.executor = #{executor}
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                and t1.execution_time <![CDATA[ > str_to_date(#{startTime},'%Y-%m-%d')]]>
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and t1.execution_time <![CDATA[ < str_to_date(#{endTime},'%Y-%m-%d')]]>
+            </if>
+        </where>
+        order by execution_time desc
+    </select>
+
+    <resultMap id="recordMap2" type="com.ztgeo.general.entity.service_data.interface_response.Sj_Inquiry_Record"></resultMap>
+    <select id="selectRecordById" parameterType="java.lang.String" resultMap="recordMap2">
+        select * from sj_inquiry_record where record_id = #{recordId}
+    </select>
+
+    <resultMap id="recordExt" type="com.ztgeo.general.entity.service_data.interface_response.Sj_Inquiry_Record_Ext"></resultMap>
+    <select id="selectRecordExts" parameterType="java.lang.String" resultMap="recordExt">
+        select * from sj_inquiry_record_ext where record_id = #{recordId}
+    </select>
+
+    <update id="updateRecordForPdf">
+        update sj_inquiry_record set pdf_path = #{pdfPath} where record_id = #{recordId}
+    </update>
+
+    <resultMap id="interfaceDatas" type="com.ztgeo.general.entity.service_data.interface_response.interface_data.InterfaceData"></resultMap>
+    <select id="selectInterfaceDatasWithOuterId" resultMap="interfaceDatas">
+        select * from data_interface_inst where outerIdOrNo = #{outerId} and interfaceCode = #{interfaceCode}
+    </select>
+</mapper>

@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.penghao.SJ_FjinstMapper" >
+  <resultMap id="BaseResultMap" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjinst" >
+    <id column="cid" property="cid" jdbcType="VARCHAR" />
+    <result column="pid" property="pid" jdbcType="VARCHAR" />
+    <result column="cname" property="cname" jdbcType="VARCHAR" />
+    <result column="pnode" property="pnode" jdbcType="VARCHAR" />
+    <result column="pnode_type" property="pnodeType" jdbcType="VARCHAR" />
+    <result column="ctype" property="ctype" jdbcType="VARCHAR" />
+    <result column="ckind" property="ckind" jdbcType="VARCHAR" />
+    <result column="file_id" property="fileId" jdbcType="VARCHAR" />
+    <result column="entry_id" property="entryId" jdbcType="VARCHAR" />
+    <result column="order_number" property="orderNumber" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="permission_level" property="permissionLevel" jdbcType="VARCHAR" />
+    <result column="ext1" property="ext1" jdbcType="VARCHAR" />
+    <result column="ext2" property="ext2" jdbcType="VARCHAR" />
+    <result column="ext3" property="ext3" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    cid, pid, cname, pnode, pnode_type, ctype, ckind, file_id, entry_id, order_number,
+    create_time, create_by, status, ext1, ext2, ext3
+  </sql>
+
+  <select id="findFjinstFjtmId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from  sj_fjinst
+    where entry_id = #{entrId}
+  </select>
+
+
+
+  <select id="selectCountNameByPid" resultType="java.lang.Integer">
+    select count(1) from sj_fjinst
+    where pid= #{pid} and cname= #{cname} and cid!=#{cid}
+  </select>
+
+
+  <select id="selectByPid" resultType="java.lang.Integer">
+    select count(1) from sj_fjinst
+    where pid=#{pid}
+  </select>
+
+  <select id="selectMaxByPid" resultType="java.lang.Integer">
+    select MAX(order_number) from sj_fjinst
+    WHERE pid= #{pid}
+  </select>
+
+
+
+  <select id="findSjFjinstByAdmin" resultMap="BaseResultMap">
+    select fjinst.* from sj_fjinst fjinst
+    INNER JOIN sj_fjtm  fjtm
+    on fjinst.entry_id=fjtm.entry_id
+    WHERE 1=1
+    AND fjinst.pnode= #{processId}
+  </select>
+
+
+
+
+
+  <select id="findSjFjinstByPosition" resultMap="BaseResultMap">
+    select fjinst.* from sj_fjinst fjinst
+    INNER JOIN sj_fjtm  fjtm
+    on fjinst.entry_id=fjtm.entry_id
+    INNER JOIN sj_power_fjtm_position po
+    on fjtm.entry_id=po.entry_id
+    WHERE 1=1
+    AND po.enable_time <![CDATA[< ]]>  NOW()
+    AND fjinst.pnode= #{processId}
+    <if test="null != list and list.size != 0">
+    AND po.position_id in
+    <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    </if>
+    GROUP BY fjinst.cid
+  </select>
+
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from sj_fjinst
+    where cid = #{cid,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from sj_fjinst
+    where cid = #{cid,jdbcType=VARCHAR}
+  </delete>
+
+  <delete id="deleteByFileId" parameterType="java.lang.String">
+    delete from sj_fjinst
+    where file_id= #{fileId}
+  </delete>
+
+  <insert id="insertList" parameterType="java.util.List">
+      insert into sj_fjinst (cid, pid, cname,
+      pnode, pnode_type, ctype,
+      ckind, file_id, entry_id,
+      order_number, create_time, create_by)
+    values
+    <foreach collection="list" index="index" item="item" separator=",">
+      (#{item.cid,jdbcType=VARCHAR}, #{item.pid,jdbcType=VARCHAR}, #{item.cname,jdbcType=VARCHAR},
+      #{item.pnode,jdbcType=VARCHAR}, #{item.pnodeType,jdbcType=VARCHAR}, #{item.ctype,jdbcType=VARCHAR},
+      #{item.ckind,jdbcType=VARCHAR},  #{item.fileId,jdbcType=VARCHAR},  #{item.entryId,jdbcType=VARCHAR},
+      #{item.orderNumber,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.createBy,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+
+
+  <insert id="insert" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjinst" >
+    insert into sj_fjinst (cid, pid, cname,
+      pnode, pnode_type, ctype,
+      ckind, file_id, entry_id,
+      order_number, create_time, create_by,
+      status, ext1, ext2,
+      ext3)
+    values (#{cid,jdbcType=VARCHAR}, #{pid,jdbcType=VARCHAR}, #{cname,jdbcType=VARCHAR},
+      #{pnode,jdbcType=VARCHAR}, #{pnodeType,jdbcType=VARCHAR}, #{ctype,jdbcType=VARCHAR},
+      #{ckind,jdbcType=VARCHAR}, #{fileId,jdbcType=VARCHAR}, #{entryId,jdbcType=VARCHAR},
+      #{orderNumber,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR},
+      #{status,jdbcType=VARCHAR}, #{ext1,jdbcType=VARCHAR}, #{ext2,jdbcType=VARCHAR},
+      #{ext3,jdbcType=VARCHAR})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjinst" >
+    insert into sj_fjinst
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cid != null" >
+        cid,
+      </if>
+      <if test="pid != null" >
+        pid,
+      </if>
+      <if test="cname != null" >
+        cname,
+      </if>
+      <if test="pnode != null" >
+        pnode,
+      </if>
+      <if test="pnodeType != null" >
+        pnode_type,
+      </if>
+      <if test="ctype != null" >
+        ctype,
+      </if>
+      <if test="ckind != null" >
+        ckind,
+      </if>
+      <if test="fileId != null" >
+        file_id,
+      </if>
+      <if test="entryId != null" >
+        entry_id,
+      </if>
+      <if test="orderNumber != null" >
+        order_number,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="ext1 != null" >
+        ext1,
+      </if>
+      <if test="ext2 != null" >
+        ext2,
+      </if>
+      <if test="ext3 != null" >
+        ext3,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cid != null" >
+        #{cid,jdbcType=VARCHAR},
+      </if>
+      <if test="pid != null" >
+        #{pid,jdbcType=VARCHAR},
+      </if>
+      <if test="cname != null" >
+        #{cname,jdbcType=VARCHAR},
+      </if>
+      <if test="pnode != null" >
+        #{pnode,jdbcType=VARCHAR},
+      </if>
+      <if test="pnodeType != null" >
+        #{pnodeType,jdbcType=VARCHAR},
+      </if>
+      <if test="ctype != null" >
+        #{ctype,jdbcType=VARCHAR},
+      </if>
+      <if test="ckind != null" >
+        #{ckind,jdbcType=VARCHAR},
+      </if>
+      <if test="fileId != null" >
+        #{fileId,jdbcType=VARCHAR},
+      </if>
+      <if test="entryId != null" >
+        #{entryId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNumber != null" >
+        #{orderNumber,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="ext1 != null" >
+        #{ext1,jdbcType=VARCHAR},
+      </if>
+      <if test="ext2 != null" >
+        #{ext2,jdbcType=VARCHAR},
+      </if>
+      <if test="ext3 != null" >
+        #{ext3,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjinst" >
+    update sj_fjinst
+    <set >
+      <if test="pid != null" >
+        pid = #{pid,jdbcType=VARCHAR},
+      </if>
+      <if test="cname != null" >
+        cname = #{cname,jdbcType=VARCHAR},
+      </if>
+      <if test="pnode != null" >
+        pnode = #{pnode,jdbcType=VARCHAR},
+      </if>
+      <if test="pnodeType != null" >
+        pnode_type = #{pnodeType,jdbcType=VARCHAR},
+      </if>
+      <if test="ctype != null" >
+        ctype = #{ctype,jdbcType=VARCHAR},
+      </if>
+      <if test="ckind != null" >
+        ckind = #{ckind,jdbcType=VARCHAR},
+      </if>
+      <if test="fileId != null" >
+        file_id = #{fileId,jdbcType=VARCHAR},
+      </if>
+      <if test="entryId != null" >
+        entry_id = #{entryId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNumber != null" >
+        order_number = #{orderNumber,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="ext1 != null" >
+        ext1 = #{ext1,jdbcType=VARCHAR},
+      </if>
+      <if test="ext2 != null" >
+        ext2 = #{ext2,jdbcType=VARCHAR},
+      </if>
+      <if test="ext3 != null" >
+        ext3 = #{ext3,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where cid = #{cid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjinst" >
+    update sj_fjinst
+    set pid = #{pid,jdbcType=VARCHAR},
+      cname = #{cname,jdbcType=VARCHAR},
+      pnode = #{pnode,jdbcType=VARCHAR},
+      pnode_type = #{pnodeType,jdbcType=VARCHAR},
+      ctype = #{ctype,jdbcType=VARCHAR},
+      ckind = #{ckind,jdbcType=VARCHAR},
+      file_id = #{fileId,jdbcType=VARCHAR},
+      entry_id = #{entryId,jdbcType=VARCHAR},
+      order_number = #{orderNumber,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      ext1 = #{ext1,jdbcType=VARCHAR},
+      ext2 = #{ext2,jdbcType=VARCHAR},
+      ext3 = #{ext3,jdbcType=VARCHAR}
+    where cid = #{cid,jdbcType=VARCHAR}
+  </update>
+
+  <select id="selectCountOfEntryFile" resultType="int">
+    select count(*) from sj_fjinst where entry_id=#{entryId} and pnode=#{pnode} and ckind = '文件'
+  </select>
+</mapper>

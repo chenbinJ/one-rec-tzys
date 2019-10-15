@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.penghao.SJ_FjfileMapper" >
+  <resultMap id="BaseResultMap" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjfile" >
+    <id column="file_id" property="fileId" jdbcType="VARCHAR" />
+    <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+    <result column="file_ext" property="fileExt" jdbcType="VARCHAR" />
+    <result column="content_type" property="contentType" jdbcType="VARCHAR" />
+    <result column="file_size" property="fileSize" jdbcType="VARCHAR" />
+    <result column="ftp_path" property="ftpPath" jdbcType="VARCHAR" />
+    <result column="file_status" property="fileStatus" jdbcType="VARCHAR" />
+    <result column="file_submission_time" property="fileSubmissionTime" jdbcType="TIMESTAMP" />
+    <result column="ext1" property="ext1" jdbcType="VARCHAR" />
+    <result column="ext2" property="ext2" jdbcType="VARCHAR" />
+    <result column="ezt3" property="ext3" jdbcType="VARCHAR" />
+    <result column="file_content" property="fileContent" jdbcType="LONGVARBINARY" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    file_id, file_name, file_ext, content_type, file_size, ftp_path, file_status, file_submission_time, 
+    ext1, ext2, ezt3,file_content
+  </sql>
+
+
+  <select id="selectSjFjfileByNameAndPnode" resultMap="BaseResultMap">
+    select sj_fjfile.* from sj_fjfile
+    where sj_fjfile.file_id in(
+      select fjinst.file_id from sj_fjinst  fjinst
+      WHERE fjinst.pid in(
+          select cid from sj_fjinst
+          WHERE cname = #{name} AND pnode = #{pnode}
+      )
+    )
+  </select>
+
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from sj_fjfile
+    where file_id = #{fileId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from sj_fjfile
+    where file_id = #{fileId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjfile" >
+    insert into sj_fjfile (file_id, file_name, file_ext, 
+      content_type, file_size, ftp_path, 
+      file_status, file_submission_time, ext1, 
+      ext2, ezt3, file_content
+      )
+    values (#{fileId,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR}, #{fileExt,jdbcType=VARCHAR}, 
+      #{contentType,jdbcType=VARCHAR}, #{fileSize,jdbcType=VARCHAR}, #{ftpPath,jdbcType=VARCHAR}, 
+      #{fileStatus,jdbcType=VARCHAR}, #{fileSubmissionTime,jdbcType=TIMESTAMP}, #{ext1,jdbcType=VARCHAR}, 
+      #{ext2,jdbcType=VARCHAR}, #{ezt3,jdbcType=VARCHAR}, #{fileContent,jdbcType=LONGVARBINARY}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjfile" >
+    insert into sj_fjfile
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="fileId != null" >
+        file_id,
+      </if>
+      <if test="fileName != null" >
+        file_name,
+      </if>
+      <if test="fileExt != null" >
+        file_ext,
+      </if>
+      <if test="contentType != null" >
+        content_type,
+      </if>
+      <if test="fileSize != null" >
+        file_size,
+      </if>
+      <if test="ftpPath != null" >
+        ftp_path,
+      </if>
+      <if test="fileStatus != null" >
+        file_status,
+      </if>
+      <if test="fileSubmissionTime != null" >
+        file_submission_time,
+      </if>
+      <if test="ext1 != null" >
+        ext1,
+      </if>
+      <if test="ext2 != null" >
+        ext2,
+      </if>
+      <if test="ezt3 != null" >
+        ezt3,
+      </if>
+      <if test="fileContent != null" >
+        file_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="fileId != null" >
+        #{fileId,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileExt != null" >
+        #{fileExt,jdbcType=VARCHAR},
+      </if>
+      <if test="contentType != null" >
+        #{contentType,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSize != null" >
+        #{fileSize,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpPath != null" >
+        #{ftpPath,jdbcType=VARCHAR},
+      </if>
+      <if test="fileStatus != null" >
+        #{fileStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSubmissionTime != null" >
+        #{fileSubmissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ext1 != null" >
+        #{ext1,jdbcType=VARCHAR},
+      </if>
+      <if test="ext2 != null" >
+        #{ext2,jdbcType=VARCHAR},
+      </if>
+      <if test="ezt3 != null" >
+        #{ezt3,jdbcType=VARCHAR},
+      </if>
+      <if test="fileContent != null" >
+        #{fileContent,jdbcType=LONGVARBINARY},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjfile" >
+    update sj_fjfile
+    <set >
+      <if test="fileName != null" >
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileExt != null" >
+        file_ext = #{fileExt,jdbcType=VARCHAR},
+      </if>
+      <if test="contentType != null" >
+        content_type = #{contentType,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSize != null" >
+        file_size = #{fileSize,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpPath != null" >
+        ftp_path = #{ftpPath,jdbcType=VARCHAR},
+      </if>
+      <if test="fileStatus != null" >
+        file_status = #{fileStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSubmissionTime != null" >
+        file_submission_time = #{fileSubmissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ext1 != null" >
+        ext1 = #{ext1,jdbcType=VARCHAR},
+      </if>
+      <if test="ext2 != null" >
+        ext2 = #{ext2,jdbcType=VARCHAR},
+      </if>
+      <if test="ezt3 != null" >
+        ezt3 = #{ezt3,jdbcType=VARCHAR},
+      </if>
+      <if test="fileContent != null" >
+        file_content = #{fileContent,jdbcType=LONGVARBINARY},
+      </if>
+    </set>
+    where file_id = #{fileId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjfile" >
+    update sj_fjfile
+    set file_name = #{fileName,jdbcType=VARCHAR},
+      file_ext = #{fileExt,jdbcType=VARCHAR},
+      content_type = #{contentType,jdbcType=VARCHAR},
+      file_size = #{fileSize,jdbcType=VARCHAR},
+      ftp_path = #{ftpPath,jdbcType=VARCHAR},
+      file_status = #{fileStatus,jdbcType=VARCHAR},
+      file_submission_time = #{fileSubmissionTime,jdbcType=TIMESTAMP},
+      ext1 = #{ext1,jdbcType=VARCHAR},
+      ext2 = #{ext2,jdbcType=VARCHAR},
+      ezt3 = #{ezt3,jdbcType=VARCHAR},
+      file_content = #{fileContent,jdbcType=LONGVARBINARY}
+    where file_id = #{fileId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Fjfile" >
+    update sj_fjfile
+    set file_name = #{fileName,jdbcType=VARCHAR},
+      file_ext = #{fileExt,jdbcType=VARCHAR},
+      content_type = #{contentType,jdbcType=VARCHAR},
+      file_size = #{fileSize,jdbcType=VARCHAR},
+      ftp_path = #{ftpPath,jdbcType=VARCHAR},
+      file_status = #{fileStatus,jdbcType=VARCHAR},
+      file_submission_time = #{fileSubmissionTime,jdbcType=TIMESTAMP},
+      ext1 = #{ext1,jdbcType=VARCHAR},
+      ext2 = #{ext2,jdbcType=VARCHAR},
+      ezt3 = #{ezt3,jdbcType=VARCHAR}
+    where file_id = #{fileId,jdbcType=VARCHAR}
+  </update>
+</mapper>

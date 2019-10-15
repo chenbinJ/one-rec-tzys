@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ztgeo.general.mapper.chenbin.WorkManagerMapper">
+    <resultMap id="exs" type="com.ztgeo.general.entity.service_data.sys_data.ExampleRespBody">
+        <result column="receiptNumber" property="receiptNumber"></result>
+        <result column="businessType" property="businessType"></result>
+        <result column="approveType" property="approveType"></result>
+        <result column="approveProcessinstanceId" property="approveProcessinstanceId"></result>
+        <result column="receiptMan" property="receiptMan"></result>
+        <result column="createTime" property="createTime"></result>
+        <result column="endTime" property="endTime"></result>
+    </resultMap>
+    <select id="selectExample" parameterType="com.ztgeo.general.entity.service_data.sys_data.ExampleSearchParams" resultMap="exs">
+        SELECT
+          t1.receipt_number receiptNumber,
+          t1.business_type businessType,
+          t2.APPROVE_TYPE approveType,
+          t3.ID_ approveProcessinstanceId,
+          t1.receipt_man receiptMan,
+          t1.receipt_time createTime,
+          t3.END_TIME_ endTime
+        FROM
+          sj_sjsq t1
+        LEFT JOIN act_approve t2 ON t1.receipt_number = t2.APPROVE_FK_ID
+        LEFT JOIN act_hi_procinst t3 ON t2.APPROVE_PROCESSINSTANCEID = t3.ID_
+        <where>
+            t2.APPROVE_STATUS = '开始'
+            AND t3.ID_ is not null
+            <if test="receiptNumber!=null and receiptNumber!=''">
+              AND t1.receipt_number LIKE CONCAT(
+              '%',
+              #{receiptNumber},
+              '%'
+              )
+            </if>
+            <if test="businessType!=null and businessType!=''">
+                AND t1.business_type = #{businessType}
+            </if>
+            <if test="approveType!=null and approveType!=''">
+                AND t2.APPROVE_TYPE LIKE CONCAT('%', #{approveType}, '%')
+            </if>
+            <if test="participant!=null and participant!=''">
+                AND EXISTS (
+                SELECT
+                id
+                FROM
+                act_approve tt1
+                WHERE
+                tt1.approve_person = #{participant}
+                ) and
+                t1.receipt_man = #{participant}
+            </if>
+            <if test="receiptDepart!=null and receiptDepart!=''">
+                AND EXISTS (
+                SELECT
+                id
+                FROM
+                act_approve tt2
+                WHERE
+                tt2.approve_person IN (
+                SELECT
+                username
+                FROM
+                base_user tt3
+                WHERE
+                tt3.depart_id IN (
+                SELECT
+                id
+                FROM
+                base_depart tt4
+                WHERE
+                tt4.`name` like CONCAT('%',#{receiptDepart},'%')
+                )
+                )
+                ) and
+                t1.receipt_man in (
+                  select tt5.username from base_user tt5 where tt5.depart_id in (select tt6.id from base_depart tt6 where tt6.`name` like CONCAT('%',#{receiptDepart},'%'))
+                )
+            </if>
+            <if test="receiptTimeStart!=null and receiptTimeStart!=''">
+                and t1.receipt_time <![CDATA[ > str_to_date(#{receiptTimeStart},'%Y-%m-%d')]]>
+            </if>
+            <if test="receiptTimeEnd!=null and receiptTimeEnd!=''">
+                and t1.receipt_time <![CDATA[ < str_to_date(#{receiptTimeEnd},'%Y-%m-%d')]]>
+            </if>
+        </where>
+        ORDER BY
+        t1.receipt_time DESC
+    </select>
+
+    <resultMap id="excs" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Exception_Record"></resultMap>
+    <select id="selectException" parameterType="com.ztgeo.general.entity.service_data.sys_data.ExceptionSearchParams" resultMap="excs">
+      select
+        *
+      from sj_exception_record
+      <where>
+          1=1
+          <if test="receiptNumber!=null and receiptNumber!=''">
+              and receipt_number like CONCAT('%',#{receiptNumber},'%')
+          </if>
+          <if test="registerNumber!=null and registerNumber!=''">
+              and register_number like CONCAT('%',#{registerNumber},'%')
+          </if>
+          <if test="businessName!=null and businessName!=''">
+              and business_name like CONCAT('%',#{businessName},'%')
+          </if>
+          <if test="excMsg!=null and excMsg!=''">
+              and exc_msg like CONCAT('%',#{excMsg},'%')
+          </if>
+          <if test="taskDirection!=null and taskDirection!=''">
+              and task_direction = #{taskDirection}
+          </if>
+          <if test="noticeType!=null and noticeType!=''">
+              and notice_type = #{noticeType}
+          </if>
+          <if test="handleStatus!=null and handleStatus!=''">
+              and ifnull(handle_status,'0') = #{handleStatus}
+          </if>
+          <if test="happenTimeStart!=null and happenTimeStart!=''">
+              and happen_time <![CDATA[ > str_to_date(#{happenTimeStart},'%Y-%m-%d')]]>
+          </if>
+          <if test="happenTimeEnd!=null and happenTimeEnd!=''">
+              and happen_time <![CDATA[ < str_to_date(#{happenTimeEnd},'%Y-%m-%d')]]>
+          </if>
+          <if test="handleMan!=null and handleMan!=''">
+              and handleMan = #{handleMan}
+          </if>
+      </where>
+      order by happen_time desc
+    </select>
+</mapper>
