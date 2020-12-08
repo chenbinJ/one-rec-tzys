@@ -4,6 +4,7 @@ import com.github.wxiaoqi.security.common.util.BooleanUtil;
 import com.ztgeo.general.component.penghao.ApproveComponent;
 import com.ztgeo.general.constant.chenbin.BizOrBizExceptionConstant;
 import com.ztgeo.general.entity.Position;
+import com.ztgeo.general.entity.activity.Approve;
 import com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Fjtm_Position;
 import com.ztgeo.general.entity.service_data.pub_data.SJ_Power_Service_Position;
 import com.ztgeo.general.entity.service_data.sys_data.MyTask;
@@ -12,6 +13,7 @@ import com.ztgeo.general.entity.service_data.sys_data.PermissionLevelResultEntit
 import com.ztgeo.general.exception.chenbin.ZtgeoBizException;
 import com.ztgeo.general.mapper.PositionUserMapper;
 import com.ztgeo.general.mapper.UserMapper;
+import com.ztgeo.general.mapper.activity.ApproveMapper;
 import com.ztgeo.general.mapper.chenbin.PositSvrManagerMapper;
 import com.ztgeo.general.mapper.chenbin.SJSpacielPowerMapper;
 import com.ztgeo.general.mapper.chenbin.StepManagerMapper;
@@ -41,6 +43,8 @@ public class ServiceAuthorizationComponent {
     private PositionUserMapper positionUserMapper;
     @Autowired
     private ApproveComponent approveComponent;
+    @Autowired
+    private ApproveMapper approveMapper;
 
     @Autowired
     private StepManagerMapper stepManagerMapper;
@@ -73,7 +77,10 @@ public class ServiceAuthorizationComponent {
         if(task!=null) {
             String assignee = task.getAssignee();
             if (StringUtils.isBlank(assignee)) {
-                return true;
+                Approve approve = approveMapper.selectByTaskId(taskId);
+                if(StringUtils.isBlank(approve.getApprovePerson())) {
+                    return true;
+                }
             }
         }else{
             throw new ZtgeoBizException(BizOrBizExceptionConstant.TASK_NOT_EXIST);
@@ -210,7 +217,11 @@ public class ServiceAuthorizationComponent {
                     }
                 } else {
                     MyTask curTask = getTask(taskId);
-                    if(curTask.getAssignee().equals(UserUtil.checkAndGetUser())){//本人签收
+                    Approve approve = approveMapper.selectByTaskId(taskId);
+                    if(StringUtils.isBlank(curTask.getAssignee())){
+                        curTask.setAssignee(approve.getApprovePerson());
+                    }
+                    if(curTask.getAssignee().equals(UserUtil.checkAndGetUser())) {//本人签收
                         isWillDo = true;
                     } else {
                         if(

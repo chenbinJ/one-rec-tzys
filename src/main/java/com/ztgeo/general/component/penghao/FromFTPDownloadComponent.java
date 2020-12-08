@@ -130,6 +130,7 @@ public class FromFTPDownloadComponent {
 
 
     public byte[] downFile(String remotePath, String fileName, byte[] bytes) {
+        FTPClient ftpClient = new FTPClient();
         try {
             int reply;
             ftpClient.connect(ftpAddress, Integer.parseInt(ftpPort));

@@ -13,9 +13,11 @@ public interface SjPowerStepPositionMapper {
 
     void deleteByStepId(String stepId);
 
-    Integer findPowerStepByReadOnly(@Param("stepId") String stepId,@Param("permissionLevel") String permissionLevel,@Param("list") List<String> list);
+    Integer findPowerStepByReadOnly(@Param("stepId") String stepId, @Param("permissionLevel") String permissionLevel, @Param("list") List<String> list);
 
     void insertList(List<SJ_Power_Step_Position> list);
+
+    List<SJ_Power_Step_Position> getPositionByStepIdOrQx(@Param("stepId") String stepId, @Param("permissionLevel") String permissionLevel);
 
     List<SJ_Power_Step_Position> getPositionByStepId(String stepId);
 

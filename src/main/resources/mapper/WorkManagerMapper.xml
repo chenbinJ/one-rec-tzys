@@ -48,8 +48,15 @@
                 act_approve tt1
                 WHERE
                 tt1.approve_person = #{participant}
-                ) and
-                t1.receipt_man = #{participant}
+                )
+                and t1.receipt_number in(
+                SELECT
+                APPROVE_FK_ID
+                FROM
+                act_approve tt1
+                WHERE
+                tt1.approve_person = #{participant}
+                )
             </if>
             <if test="receiptDepart!=null and receiptDepart!=''">
                 AND EXISTS (

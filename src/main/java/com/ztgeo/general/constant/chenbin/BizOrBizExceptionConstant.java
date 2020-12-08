@@ -5,6 +5,7 @@ public class BizOrBizExceptionConstant {
     public final static String INTERFACE_DATA_OUTER_CODE_REC = "REC";
     public final static String INTERFACE_DATA_OUTER_CODE_ACT = "ACT";
     public final static String OBLIGEE_TYPE_OF_QLR = "权利人";
+    public final static String OBLIGEE_TYPE_OF_QLR_DLR = "权利代理人";
     public final static String OBLIGEE_TYPE_OF_YWR = "义务人";
     public final static String OBLIGEE_TYPE_OF_DYQR = "抵押权人";
     public final static String OBLIGEE_TYPE_OF_DYR = "抵押人";
@@ -84,6 +85,7 @@ public class BizOrBizExceptionConstant {
     public final static String GET_TRANSACTION_CONTRACT_COUNT_ERROR = "查询的交易合同不唯一";
     public final static String GET_MORTGAGE_CONTRACT_COUNT_ERROR = "查询的抵押合同不唯一";
     public final static String GET_TAXATION_COUNT_ERROR = "查询到的地税信息不唯一";
+    public final static String GET_IMMOV_COUNT_ERROR = "查询到的楼盘信息不唯一";
     public final static String USER_STEP_POWER_OUT = "登录用户越权操作";
     public final static String RECEIPT_NUMBER_IS_NULL = "收件编号不可为空";
     public final static String STEP_SERVICE_POWER_OUT = "步骤服务越权操作";
@@ -100,6 +102,8 @@ public class BizOrBizExceptionConstant {
     public final static String INPUT_SAME_MORTGAGE_CERT_NO = "传入重复的不动产抵押证明号";
     public final static String UPDATE_BDC_CERT_NO_NOT_EXIST = "要求更新的不动产权属信息不存在";
     public final static String UPDATE_BDC_MORTGAGE_NO_NOT_EXIST = "要求更新的不动产抵押信息不存在";
+    public final static String IMMOVABLE_IS_EXIST = "该收件已存在楼盘信息，禁止多次插入";
+    public final static String UPDATE_IMMOVABLE_NOT_EXIST = "要求更新的楼盘信息不存在";
     public final static String MORTGAGE_CONTRACT_IS_EXIST = "该收件已存在抵押合同信息，禁止合同信息重复插入";
     public final static String UPDATE_MORTGAGE_CONTRACT_NOT_EXIST = "要求更新的抵押合同信息不存在";
     public final static String TRANSACTION_CONTRACT_IS_EXIST = "该收件已存在交易合同信息，禁止合同信息重复插入";

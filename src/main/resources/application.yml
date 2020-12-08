@@ -1,10 +1,11 @@
 
 server:
-  port: 7780
+  port: 7781
   max-http-header-size: 4048576
 spring:
   redis:
     password: ztgeoredis
+    database: 8
   autoconfigure:
     exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   application:
@@ -40,7 +41,7 @@ spring:
         maxOpenPreparedStatements: 20
       datasource:
         admin:
-          url: jdbc:mysql://10.3.2.147:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
+          url: jdbc:mysql://localhost:3306/ag-admin?useUnicode=true&characterEncoding=UTF8&useSSL=true
           username: consignee
           password: ztgeo
           driver-class-name: com.mysql.jdbc.Driver
@@ -89,7 +90,7 @@ redis:
   timeout: 2000
   sysName: ace-pubserver
   enable: true
-  database: 0
+  database: 8
 # 配置数据库
 mybatis:
   mapper-locations: "classpath*:mapper/*.xml"
@@ -112,7 +113,7 @@ special:
   admin: admin
 
 webplus:
-  ftpAddress: 10.3.2.203
+  ftpAddress: 127.0.0.1
   ftpPort: 21
   ftpUsername: forftp
   ftpPassword: 123456
@@ -121,7 +122,7 @@ entry:
   comparison: 身份证照片附件
 logging:
   level:
-    com.ztgeo.general: debug
+    com.ztgeo.general: error
 
 # 跨服务数据合并 用于允许 字段的获取方式
 merge:

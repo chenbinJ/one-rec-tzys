@@ -60,6 +60,7 @@ public class SJFjfileController {
             outputStream.flush();
         } catch (Exception e) {
             log.error("error", e);
+            throw new ZtgeoBizException("FTP下载异常");
         } finally {
             try {
                 if(outputStream!=null)

@@ -118,6 +118,17 @@
   AND t1.service_code = #{serviceCode}
   </select>
 
+    <resultMap id="Immovs" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Info_Immovable"></resultMap>
+    <select id="selectImmovs" resultMap="Immovs">
+        SELECT
+	      t1.*
+        FROM
+	      sj_info_immovalbe t1
+        WHERE
+	      t1.receipt_number = #{sqbh}
+        AND t1.service_code = #{serviceCode}
+    </select>
+
   <resultMap id="qlrgls" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Qlr_Gl">
     <result column="relation_id" property="relationId"></result>
     <result column="info_id" property="infoId"></result>
@@ -189,6 +200,9 @@
     </select>
     <select id="selectDyhtxxBySqbh" resultMap="dyhtxxs">
         select * from sj_info_dyhtxx where receipt_number=#{receiptNumber}
+    </select>
+    <select id="selectImmovBySqbh" resultMap="Immovs">
+        select * from sj_info_immovalbe where receipt_number=#{receiptNumber}
     </select>
     <select id="selectQsxxBySqbh" resultMap="qsxxs">
         select * from sj_info_qsxx where receipt_number=#{receiptNumber} and service_code=#{serviceCode} and xtsphm = #{xtsphm} and nsrsbh=#{nsrsbh}
@@ -910,6 +924,7 @@
         info_id,
         receipt_number,
         acceptance_number,
+        old_number,
         handle_result,
         handle_text,
         remarks,
@@ -926,6 +941,7 @@
         #{infoId},
         #{receiptNumber},
         #{acceptanceNumber,jdbcType=VARCHAR},
+        #{oldNumber,jdbcType=VARCHAR},
         #{handleResult,jdbcType=VARCHAR},
         #{handleText,jdbcType=VARCHAR},
         #{remarks,jdbcType=VARCHAR},
@@ -944,6 +960,9 @@
         update sj_info_handle_result set
         receipt_number=#{receiptNumber},
         acceptance_number = #{acceptanceNumber,jdbcType=VARCHAR},
+        <if test="oldNumber!=null and oldNumber!=''">
+          old_number = #{oldNumber,jdbcType=VARCHAR},
+        </if>
         handle_result = #{handleResult,jdbcType=VARCHAR},
         handle_text = #{handleText,jdbcType=VARCHAR},
         remarks = #{remarks,jdbcType=VARCHAR},
@@ -956,6 +975,64 @@
         ext2=#{ext2,jdbcType=VARCHAR},
         ext3=#{ext3,jdbcType=VARCHAR}
         where info_id = #{infoId}
+    </update>
+    <insert id="insertImmovable" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Info_Immovable">
+        insert into sj_info_immovalbe(
+          info_id,
+          receipt_number,
+          service_code,
+          data_json,
+          provide_unit,
+          data_come_from_mode,
+          preservation_man,
+          insert_time,
+          ext1,
+          ext2,
+          ext3,
+          kfqy,
+          lpzl,
+          xmmc,
+          lpmc,
+          zh,
+          remarks
+        )values(
+          #{infoId},
+          #{receiptNumber},
+          #{serviceCode,jdbcType=VARCHAR},
+          #{dataJson,jdbcType=VARCHAR},
+          #{provideUnit,jdbcType=VARCHAR},
+          #{dataComeFromMode,jdbcType=VARCHAR},
+          #{preservationMan,jdbcType=VARCHAR},
+          str_to_date(#{insertTime}, '%Y-%m-%d %H:%i:%s'),
+          #{ext1,jdbcType=VARCHAR},
+          #{ext2,jdbcType=VARCHAR},
+          #{ext3,jdbcType=VARCHAR},
+          #{kfqy,jdbcType=VARCHAR},
+          #{lpzl,jdbcType=VARCHAR},
+          #{xmmc,jdbcType=VARCHAR},
+          #{lpmc,jdbcType=VARCHAR},
+          #{zh,jdbcType=VARCHAR},
+          #{remarks,jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateImmovable" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Info_Immovable">
+      update sj_info_immovalbe set
+        receipt_number=#{receiptNumber},
+        service_code=#{serviceCode,jdbcType=VARCHAR},
+        data_json=#{dataJson,jdbcType=VARCHAR},
+        provide_unit=#{provideUnit,jdbcType=VARCHAR},
+        data_come_from_mode=#{dataComeFromMode,jdbcType=VARCHAR},
+        preservation_man=#{preservationMan,jdbcType=VARCHAR},
+        ext1=#{ext1,jdbcType=VARCHAR},
+        ext2=#{ext2,jdbcType=VARCHAR},
+        ext3=#{ext3,jdbcType=VARCHAR},
+        kfqy=#{kfqy,jdbcType=VARCHAR},
+        lpzl=#{lpzl,jdbcType=VARCHAR},
+        xmmc=#{xmmc,jdbcType=VARCHAR},
+        lpmc=#{lpmc,jdbcType=VARCHAR},
+        zh=#{zh,jdbcType=VARCHAR},
+        remarks=#{remarks,jdbcType=VARCHAR}
+      where info_id = #{infoId}
     </update>
     <insert id="insertBdcgl" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Gl">
         insert into sj_bdc_gl (
@@ -1048,6 +1125,7 @@ where parcel_id = #{parcelId}
     <insert id="insertFdInfo" parameterType="com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Fw_Info">
 insert into sj_bdc_fw_info(
 	house_id,
+	houser_unified_code,
 	household_id,
 	seat_id,
 	building_number,
@@ -1078,6 +1156,7 @@ insert into sj_bdc_fw_info(
 	ext3
 ) values (
 	#{houseId},
+	#{houserUnifiedCode,jdbcType=VARCHAR},
     #{householdId,jdbcType=VARCHAR},
     #{seatId,jdbcType=VARCHAR},
     #{buildingNumber,jdbcType=VARCHAR},
@@ -1308,4 +1387,22 @@ where
         where
           id = #{id}
     </update>
+
+    <delete id="deleteBDCGlByInfoId" parameterType="java.lang.String">
+        delete from sj_bdc_gl where info_id = #{infoId}
+    </delete>
+    <delete id="deleteQLRGlByInfoIdAndObligeeType">
+        delete from sj_qlr_gl where info_id = #{infoId} and obligee_type = #{obligeeType}
+    </delete>
+
+    <select id="selectUsedQlrCount" resultType="int">
+        select count(*) from sj_qlr_gl where obligee_id = #{obligeeId} and info_id not in (#{infoId})
+    </select>
+    <select id="selectNotUseBdcGlCount" resultType="int">
+        select count(*) from sj_bdc_gl where immovable_id = #{immovableId} and immovable_type=#{immovableType} and info_id not in (#{infoId})
+    </select>
+    <resultMap id="qlrMap" type="com.ztgeo.general.entity.service_data.pub_data.SJ_Qlr_Info"></resultMap>
+    <select id="selectObligeeById" parameterType="java.lang.String" resultMap="qlrMap">
+        select * from sj_qlr_info where obligee_id = #{obligeeId}
+    </select>
 </mapper>

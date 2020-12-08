@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class SJ_Bdc_Fw_Info implements Serializable {
+    private String id;                                          //楼盘数据id
     private String houseId;                                     //不动产信息主键
+    private String houserUnifiedCode;                           //房屋统一标识码
     private String householdId;                                 //交易合同中的户id
     private String seatId;                                      //交易合同中的幢id
     private String buildingNumber;                              //交易合同中的楼盘编号
@@ -34,12 +36,66 @@ public class SJ_Bdc_Fw_Info implements Serializable {
     private String ext2;                                        //扩展字段2
     private String ext3;                                        //扩展字段3
 
+    public SJ_Bdc_Fw_Info() {
+        super();
+    }
+
+    public SJ_Bdc_Fw_Info(String id,String houseId, String houserUnifiedCode, String householdId, String seatId, String buildingNumber, String houseNumber, String immovableUnicode, String immovablePlanningUse, String houseLocation, String immovableUnitNumber, String householdNumber, String seatNumber, String householdMark, String roomMark, String unitMark, String totalStorey, String locationStorey, String projectName, BigDecimal architecturalArea, BigDecimal houseArchitecturalArea, BigDecimal apportionmentArchitecturalArea, String buildingName, String mortgageSituation, String closureSituation, String objectionSituation, String remarks, String status, String ext1, String ext2, String ext3) {
+        this.id = id;
+        this.houseId = houseId;
+        this.houserUnifiedCode = houserUnifiedCode;
+        this.householdId = householdId;
+        this.seatId = seatId;
+        this.buildingNumber = buildingNumber;
+        this.houseNumber = houseNumber;
+        this.immovableUnicode = immovableUnicode;
+        this.immovablePlanningUse = immovablePlanningUse;
+        this.houseLocation = houseLocation;
+        this.immovableUnitNumber = immovableUnitNumber;
+        this.householdNumber = householdNumber;
+        this.seatNumber = seatNumber;
+        this.householdMark = householdMark;
+        this.roomMark = roomMark;
+        this.unitMark = unitMark;
+        this.totalStorey = totalStorey;
+        this.locationStorey = locationStorey;
+        this.projectName = projectName;
+        this.architecturalArea = architecturalArea;
+        this.houseArchitecturalArea = houseArchitecturalArea;
+        this.apportionmentArchitecturalArea = apportionmentArchitecturalArea;
+        this.buildingName = buildingName;
+        this.mortgageSituation = mortgageSituation;
+        this.closureSituation = closureSituation;
+        this.objectionSituation = objectionSituation;
+        this.remarks = remarks;
+        this.status = status;
+        this.ext1 = ext1;
+        this.ext2 = ext2;
+        this.ext3 = ext3;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getHouseId() {
         return houseId;
     }
 
     public void setHouseId(String houseId) {
         this.houseId = houseId;
+    }
+
+    public String getHouserUnifiedCode() {
+        return houserUnifiedCode;
+    }
+
+    public void setHouserUnifiedCode(String houserUnifiedCode) {
+        this.houserUnifiedCode = houserUnifiedCode;
     }
 
     public String getHouseholdId() {

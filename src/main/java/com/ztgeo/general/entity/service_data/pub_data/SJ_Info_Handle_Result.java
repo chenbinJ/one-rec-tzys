@@ -2,6 +2,7 @@ package com.ztgeo.general.entity.service_data.pub_data;
 
 public class SJ_Info_Handle_Result extends SJ_Information {
     private String acceptanceNumber;
+    private String oldNumber;
     private String handleResult;
     private String handleText;
     private String remarks;
@@ -16,6 +17,14 @@ public class SJ_Info_Handle_Result extends SJ_Information {
 
     public void setAcceptanceNumber(String acceptanceNumber) {
         this.acceptanceNumber = acceptanceNumber;
+    }
+
+    public String getOldNumber() {
+        return oldNumber;
+    }
+
+    public void setOldNumber(String oldNumber) {
+        this.oldNumber = oldNumber;
     }
 
     public String getHandleResult() {

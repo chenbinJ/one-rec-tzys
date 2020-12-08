@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.general.mapper.chenbin.tz.SjTzDataMapper" >
+    <resultMap id="tzBusiDatas" type="com.ztgeo.general.entity.tz_entity.TZBusinessData"></resultMap>
+    <select id="selectTZBusinessDatas" parameterType="java.lang.String" resultMap="tzBusiDatas">
+        select * from sj_tz_data where receiptNumber = #{receiptNumber}
+    </select>
+    <insert id="insertTzBusinessData" parameterType="com.ztgeo.general.entity.tz_entity.TZBusinessData">
+        insert into sj_tz_data (
+          id,
+          receiptNumber,
+          oldBusinessNumber,
+          canDoDepart,
+          businessType
+        ) values (
+          #{id},
+          #{receiptNumber},
+          #{oldBusinessNumber},
+          #{canDoDepart},
+          #{businessType}
+        )
+    </insert>
+    <update id="updateTzBusinessData" parameterType="com.ztgeo.general.entity.tz_entity.TZBusinessData">
+        update sj_tz_data set
+          receiptNumber = #{receiptNumber},
+          oldBusinessNumber = #{oldBusinessNumber},
+          canDoDepart = #{canDoDepart},
+          businessType = #{businessType}
+        where id = #{id}
+    </update>
+</mapper>

@@ -1,5 +1,7 @@
 package com.ztgeo.general.biz.service_biz.chenbin.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.util.BooleanUtil;
 import com.ztgeo.general.biz.service_biz.chenbin.RecieveDataBusinessBiz;
 import com.ztgeo.general.component.chenbin.OtherComponent;
@@ -24,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -275,8 +278,8 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
                 List<SJ_Qlr_Gl> ywrgls = bdcqlxx.getGlObligorVoList();
 
                 dealSaveBdcGls(bdcgls,bdcqlxx.getInfoId());
-                dealSaveQlrGls(qlrgls,bdcqlxx.getInfoId());
-                dealSaveQlrGls(ywrgls,bdcqlxx.getInfoId());
+                dealSaveQlrGls(qlrgls,bdcqlxx.getInfoId(),BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR);
+                dealSaveQlrGls(ywrgls,bdcqlxx.getInfoId(),BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_YWR);
 
             }
         }
@@ -337,8 +340,8 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
                 List<SJ_Qlr_Gl> dyrgls = bdcdyxx.getGlMortgagorVoList();
 
                 dealSaveBdcGls(bdcgls,bdcdyxx.getInfoId());//未完成
-                dealSaveQlrGls(dyqrgls,bdcdyxx.getInfoId());//未完成
-                dealSaveQlrGls(dyrgls,bdcdyxx.getInfoId());//未完成
+                dealSaveQlrGls(dyqrgls,bdcdyxx.getInfoId(),BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_DYQR);//未完成
+                dealSaveQlrGls(dyrgls,bdcdyxx.getInfoId(),BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_DYR);//未完成
             }
         }
     }
@@ -391,8 +394,8 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
             List<SJ_Qlr_Gl> sellergls = jyhtxx.getGlHouseSellerVoList();
 
             dealSaveBdcGls(bdcgls,jyhtxx.getInfoId());//未完成
-            dealSaveQlrGls(buyergls,jyhtxx.getInfoId());//未完成
-            dealSaveQlrGls(sellergls,jyhtxx.getInfoId());//未完成
+            dealSaveQlrGls(buyergls,jyhtxx.getInfoId(),BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_GFZ);//未完成
+            dealSaveQlrGls(sellergls,jyhtxx.getInfoId(),BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_SFZ);//未完成
         }
     }
     //保存银行抵押合同信息
@@ -443,8 +446,8 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
             List<SJ_Qlr_Gl> dyrgls = dyhtxx.getGlMortgagorVoList();
             String infoId = dyhtxx.getInfoId();
             dealSaveBdcGls(bdcgls,infoId);//未完成
-            dealSaveQlrGls(dyqrgls,infoId);//未完成
-            dealSaveQlrGls(dyrgls,infoId);//未完成
+            dealSaveQlrGls(dyqrgls,infoId,BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_DYQR);//未完成
+            dealSaveQlrGls(dyrgls,infoId,BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_DYR);//未完成
         }
     }
     //保存地税信息
@@ -523,12 +526,24 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
 //                    if(handleResult_temp!=null){
 //                        throw new ZtgeoBizException(BizOrBizExceptionConstant.TAX_INFO_IS_EXIST);
 //                    }
-                    handleResult.setInfoId(IDUtil.getInfoId());
-                    handleResult.setInsertTime(new Date());
-                    if(StringUtils.isBlank(handleResult.getPreservationMan())){
-                        handleResult.setPreservationMan(UserUtil.checkAndGetUser());
+                    if(exist_handleReslts!=null && exist_handleReslts.size()>0){
+                        handleResult.setInfoId(exist_handleReslts.get(0).getInfoId());
+                        handleResult.setOldNumber(exist_handleReslts.get(0).getOldNumber());
+                        handleResult.setProvideUnit(exist_handleReslts.get(0).getProvideUnit());
+                        handleResult.setPreservationMan(exist_handleReslts.get(0).getPreservationMan());
+                        handleResult.setDataComeFromMode(exist_handleReslts.get(0).getDataComeFromMode());
+                        int i = sJInfoManagerMapper.updateHandleResult(handleResult);
+                        if(i<1){//受影响的行数不为1时抛出异常
+                            throw new ZtgeoBizException(BizOrBizExceptionConstant.UPDATE_HANDLE_RESULT_NOT_EXIST);
+                        }
+                    }else {
+                        handleResult.setInfoId(IDUtil.getInfoId());
+                        handleResult.setInsertTime(new Date());
+                        if (StringUtils.isBlank(handleResult.getPreservationMan())) {
+                            handleResult.setPreservationMan(UserUtil.checkAndGetUser());
+                        }
+                        sJInfoManagerMapper.insertHandleResult(handleResult);
                     }
-                    sJInfoManagerMapper.insertHandleResult(handleResult);
                 }else{
 //                    if(qsxx_temp!=null && ! qsxx_temp.getInfoId().equals(qsxx.getInfoId())){
 //                        throw new ZtgeoBizException(BizOrBizExceptionConstant.TAX_INFO_IS_EXIST);
@@ -541,14 +556,85 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
             }
         }
     }
-    //处理不动产,待完成
+    //处理不动产
     public void dealSaveImmovable(String stepId,SJ_Info_Immovable immovable){
-
+        if(immovable!=null){
+            PermissionLevelResultEntity powerlevel = checkStepSvrPower(stepId,immovable);//验证步骤服务权限
+            List<SJ_Info_Immovable> exist_immovs = sJInfoManagerMapper.selectImmovs(immovable.getReceiptNumber(),immovable.getServiceCode());
+            if(
+                    exist_immovs!=null
+                            && exist_immovs.size()>0
+                            && powerlevel.getPermissionLevel().equals(
+                                BizOrBizExceptionConstant.POWER_LEVEL_NULL_WRITE
+                            )
+            ){
+                boolean isOrNot = true;
+                for(SJ_Info_Immovable exist_immov:exist_immovs){
+                    isOrNot = isOrNot&&WriteNotNullSaveSelfOrNot(exist_immov);
+                }
+                if(!isOrNot) {
+                    return;
+                }
+            }
+            SJ_Info_Immovable immov_temp = sJInfoManagerMapper.selectImmovBySqbh(immovable.getReceiptNumber());
+            if(StringUtils.isBlank(immovable.getInfoId())){
+                if(immov_temp!=null){
+                    throw new ZtgeoBizException(BizOrBizExceptionConstant.IMMOVABLE_IS_EXIST);
+                }
+                immovable.setInfoId(IDUtil.getInfoId());
+                immovable.setInsertTime(new Date());
+                if(StringUtils.isBlank(immovable.getPreservationMan())){
+                    immovable.setPreservationMan(UserUtil.checkAndGetUser());
+                }
+                sJInfoManagerMapper.insertImmovable(immovable);
+            }else{
+                if(immov_temp!=null && !immov_temp.getInfoId().equals(immovable.getInfoId())){//infoID传入的和已经存在的不一致
+                    throw new ZtgeoBizException(BizOrBizExceptionConstant.IMMOVABLE_IS_EXIST);
+                }
+                int i = sJInfoManagerMapper.updateImmovable(immovable);
+                if(i<1){//受影响的行数不为1时抛出异常
+                    throw new ZtgeoBizException(BizOrBizExceptionConstant.UPDATE_IMMOVABLE_NOT_EXIST);
+                }
+            }
+            //权证关联的不动产信息的保存
+            List<SJ_Bdc_Gl> bdcgls = immovable.getGlImmovableVoList();
+            //权利人关联
+            List<SJ_Qlr_Gl> qlrgls = immovable.getGlObligeeVoList();
+            //代理人关联
+            List<SJ_Qlr_Gl> dlrgls = immovable.getGlAgentVoList();
+            String infoId = immovable.getInfoId();
+            dealSaveBdcGls(bdcgls,infoId);//未完成
+            dealSaveQlrGls(qlrgls,infoId,BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR);//未完成
+            dealSaveQlrGls(dlrgls,infoId,BizOrBizExceptionConstant.OBLIGEE_TYPE_OF_QLR_DLR);
+        }
     }
     //处理不动产关联信息
     private void dealSaveBdcGls(List<SJ_Bdc_Gl> bdcgls,String infoId){
-        if(bdcgls!=null){
+        //查现有的关联数据
+        List<SJ_Bdc_Gl> bdcgls_exist = sJInfoManagerMapper.selectBdcglByInfoId(infoId);
+
+        if(bdcgls!=null && bdcgls.size()>0){
+            //判断多余项并确定是否需要删除
+            if(bdcgls_exist!=null) {
+                for (SJ_Bdc_Gl bdcgl_exist : bdcgls_exist) {
+                    if(isOutBdcgl(bdcgl_exist,bdcgls)){
+                        deleteImmovExist(bdcgl_exist);
+                        sJInfoManagerMapper.deleteBDCGLById(bdcgl_exist.getRelationId());
+                    }
+                }
+            }
+            bdcgls_exist = sJInfoManagerMapper.selectBdcglByInfoId(infoId);
+            //去除当前存在的重复项
+            List<Integer> sameIndexs = findSameBdcGlSelf(bdcgls_exist);
+            for(Integer index:sameIndexs){//删除重复项，注意这里按照相同info不同immovable来删除
+                deleteImmovExist(bdcgls_exist.get(index));
+                sJInfoManagerMapper.deleteBDCGLById(bdcgls_exist.get(index).getRelationId());
+            }
+            bdcgls_exist = sJInfoManagerMapper.selectBdcglByInfoId(infoId);
+            System.out.println("处理后的数据条数为："+bdcgls_exist.size()+"\n具体为："+JSONArray.toJSONString(bdcgls_exist));
+            //执行插入或更新（插入前判断重复关系）
             for(SJ_Bdc_Gl bdcgl:bdcgls){
+                SJ_Bdc_Gl samegl = isCopyBdc(bdcgl,bdcgls_exist);
                 String immovableId = null;
                 //不动产信息入库
                 if(bdcgl.getImmovableType().equals(BizOrBizExceptionConstant.IMMOVABLE_TYPE_OF_JD)){
@@ -559,14 +645,26 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
                             if(sJInfoManagerMapper.selectCountOfParcel(zdInfo.getParcelId())>0) {
                                 sJInfoManagerMapper.updateZdInfo(zdInfo);
                             } else {
-                                sJInfoManagerMapper.insertZdInfo(zdInfo);
+                                if(samegl!=null){//存在重复
+                                    SJ_Bdc_Zd_Info zd_info_exit = sJInfoManagerMapper.selectBdcJDByInfoId(samegl.getImmovableId());
+                                    zdInfo.setParcelId(zd_info_exit.getParcelId());
+                                    sJInfoManagerMapper.updateZdInfo(zdInfo);
+                                }else {
+                                    sJInfoManagerMapper.insertZdInfo(zdInfo);
+                                }
                             }
                         } else {
-                            zdInfo.setParcelId(IDUtil.getImmovableId());//注入主键
-                            sJInfoManagerMapper.insertZdInfo(zdInfo);
+                            if(samegl!=null){//存在重复
+                                SJ_Bdc_Zd_Info zd_info_exit = sJInfoManagerMapper.selectBdcJDByInfoId(samegl.getImmovableId());
+                                zdInfo.setParcelId(zd_info_exit.getParcelId());
+                                sJInfoManagerMapper.updateZdInfo(zdInfo);
+                            }else {
+                                zdInfo.setParcelId(IDUtil.getImmovableId());//注入主键
+                                sJInfoManagerMapper.insertZdInfo(zdInfo);
+                            }
                         }
+                        immovableId = zdInfo.getParcelId();
                     }
-                    immovableId = zdInfo.getParcelId();
                 }else{
                     SJ_Bdc_Fw_Info fwInfo = bdcgl.getFwInfo();
                     if(fwInfo!=null) {
@@ -575,36 +673,83 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
                             if(sJInfoManagerMapper.selectCountOfHouse(fwInfo.getHouseId())>0) {
                                 sJInfoManagerMapper.updateFdInfo(fwInfo);
                             } else {
-                                sJInfoManagerMapper.insertFdInfo(fwInfo);
+                                if(samegl!=null){//存在重复
+                                    SJ_Bdc_Fw_Info fw_exit = sJInfoManagerMapper.selectBdcFDByInfoId(samegl.getImmovableId());
+                                    fwInfo.setHouseId(fw_exit.getHouseId());
+                                    sJInfoManagerMapper.updateFdInfo(fwInfo);
+                                }else{
+                                    sJInfoManagerMapper.insertFdInfo(fwInfo);
+                                }
                             }
                         } else {
-                            fwInfo.setHouseId(IDUtil.getImmovableId());//注入主键
-                            sJInfoManagerMapper.insertFdInfo(fwInfo);
+                            if(samegl!=null){//存在重复
+                                SJ_Bdc_Fw_Info fw_exit = sJInfoManagerMapper.selectBdcFDByInfoId(samegl.getImmovableId());
+                                fwInfo.setHouseId(fw_exit.getHouseId());
+                                if(samegl.getRelationId().equals("RELAT-20191022-DC44F4DDE34")){
+                                    System.out.println("不同的实体："+ JSONObject.toJSONString(fwInfo));
+                                }
+                                sJInfoManagerMapper.updateFdInfo(fwInfo);
+                            }else {
+                                fwInfo.setHouseId(IDUtil.getImmovableId());//注入主键
+                                sJInfoManagerMapper.insertFdInfo(fwInfo);
+                            }
                         }
+                        immovableId = fwInfo.getHouseId();
                     }
-                    immovableId = fwInfo.getHouseId();
                 }
                 //保存关联信息
                 if(StringUtils.isNotBlank(bdcgl.getRelationId())){
                     sJInfoManagerMapper.updateBdcgl(bdcgl);
                 }else{
-                    bdcgl.setRelationId(IDUtil.getStepGlId());
-                    if(StringUtils.isBlank(bdcgl.getImmovableId())) {
+                    if (StringUtils.isBlank(bdcgl.getImmovableId())) {
                         bdcgl.setImmovableId(immovableId);
                     }
-                    if(StringUtils.isBlank(bdcgl.getInfoId())) {
+                    if (StringUtils.isBlank(bdcgl.getInfoId())) {
                         bdcgl.setInfoId(infoId);
                     }
-                    sJInfoManagerMapper.insertBdcgl(bdcgl);
+                    if(samegl!=null){
+                        bdcgl.setRelationId(samegl.getRelationId());
+                        sJInfoManagerMapper.updateBdcgl(bdcgl);
+                    }else {
+                        bdcgl.setRelationId(IDUtil.getStepGlId());
+                        sJInfoManagerMapper.insertBdcgl(bdcgl);
+                    }
                 }
-
+            }
+        } else {//传入的不动产关联数据为空
+            //删除之
+            sJInfoManagerMapper.deleteBDCGlByInfoId(infoId);
+            if(bdcgls_exist!=null) {
+                for (SJ_Bdc_Gl bdcgl_exist : bdcgls_exist) {
+                    deleteImmovExist(bdcgl_exist);
+                }
             }
         }
     }
     //处理权利人关联信息
-    private void dealSaveQlrGls(List<SJ_Qlr_Gl> qlrgls,String infoId){
-        if(qlrgls!=null){
+    private void dealSaveQlrGls(List<SJ_Qlr_Gl> qlrgls,String infoId,String obligeeType){
+        List<SJ_Qlr_Gl> qlrgls_exist = sJInfoManagerMapper.selectQlrGlByInfoId(infoId,obligeeType);
+        if(qlrgls!=null && qlrgls.size()>0){
+            //判断多余项并确定是否需要删除
+            if(qlrgls_exist!=null) {
+                for (SJ_Qlr_Gl qlrgl_exist : qlrgls_exist) {
+                    if(isOutQlrgl(qlrgl_exist,qlrgls)){
+                        RemoveExistQlr(qlrgl_exist);
+                        sJInfoManagerMapper.deleteQlrGlById(qlrgl_exist.getRelationId());
+                    }
+                }
+            }
+            qlrgls_exist = sJInfoManagerMapper.selectQlrGlByInfoId(infoId,obligeeType);
+            //去除当前存在的重复项
+            List<Integer> sameIndexs = findSameQlrGlSelf(qlrgls_exist);
+            for(Integer index:sameIndexs){//删除重复项，注意这里按照相同info不同immovable来删除
+                RemoveExistQlr(qlrgls_exist.get(index));
+                sJInfoManagerMapper.deleteQlrGlById(qlrgls_exist.get(index).getRelationId());
+            }
+            qlrgls_exist = sJInfoManagerMapper.selectQlrGlByInfoId(infoId,obligeeType);
+            System.out.println("处理后的‘权利人’数据条数为："+qlrgls_exist.size()+"\n具体为："+JSONArray.toJSONString(qlrgls_exist));
             for(SJ_Qlr_Gl qlrgl:qlrgls){
+                SJ_Qlr_Gl samegl = isCopyQlr(qlrgl,qlrgls_exist);
                 SJ_Qlr_Info qlr = qlrgl.getRelatedPerson();
                 if(qlr!=null){
                     System.out.println(qlr.getObligeeId());
@@ -613,26 +758,49 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
                         if(sJInfoManagerMapper.selectCountOfObligee(qlr.getObligeeId())>0) {
                             sJInfoManagerMapper.updateQlr(qlr);
                         } else {
-                            sJInfoManagerMapper.insertQlr(qlr);
+                            if(samegl!=null) {
+                                qlr.setObligeeId(samegl.getObligeeId());
+                                sJInfoManagerMapper.updateQlr(qlr);
+                            }else{
+                                sJInfoManagerMapper.insertQlr(qlr);
+                            }
                         }
                     }else{
-                        qlr.setObligeeId(IDUtil.getObligeeId());//注入主键
-                        sJInfoManagerMapper.insertQlr(qlr);
+                        if(samegl!=null){
+                            qlr.setObligeeId(samegl.getObligeeId());
+                            sJInfoManagerMapper.updateQlr(qlr);
+                        }else {
+                            qlr.setObligeeId(IDUtil.getObligeeId());//注入主键
+                            sJInfoManagerMapper.insertQlr(qlr);
+                        }
                     }
                 }
                 if(StringUtils.isNotBlank(qlrgl.getRelationId())){
                     sJInfoManagerMapper.updateQlrgl(qlrgl);
                 }else{
-                    qlrgl.setRelationId(IDUtil.getStepGlId());
                     if(StringUtils.isBlank(qlrgl.getInfoId())) {
                         qlrgl.setInfoId(infoId);
                     }
                     if(StringUtils.isBlank(qlrgl.getObligeeId())) {
                         qlrgl.setObligeeId(qlr.getObligeeId());
                     }
-                    sJInfoManagerMapper.insertQlrgl(qlrgl);
+                    if(samegl!=null){
+                        qlrgl.setRelationId(samegl.getRelationId());
+                        sJInfoManagerMapper.updateQlrgl(qlrgl);
+                    }else {
+                        qlrgl.setRelationId(IDUtil.getStepGlId());
+                        sJInfoManagerMapper.insertQlrgl(qlrgl);
+                    }
                 }
             }
+        }else{
+            //删除之
+            if(qlrgls_exist!=null){
+                for(SJ_Qlr_Gl qlrgl_exist:qlrgls_exist){
+                    RemoveExistQlr(qlrgl_exist);
+                }
+            }
+            sJInfoManagerMapper.deleteQLRGlByInfoIdAndObligeeType(infoId,obligeeType);
         }
     }
 
@@ -774,6 +942,19 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
                 List<SJ_Info_Handle_Result> handleResults = this.sJInfoManagerMapper.selectHandleResults(sjsq.getReceiptNumber(),serviceCode);
                 sjsq.setHandleResultVoList(handleResults);
                 break;
+            case BizOrBizExceptionConstant.IMMOVEABLE_BUILDING_SERVICE:
+                List<SJ_Info_Immovable> immovs = this.sJInfoManagerMapper.selectImmovs(sjsq.getReceiptNumber(),serviceCode);
+                if(immovs!=null && immovs.size()>1){
+                    throw new ZtgeoBizException(BizOrBizExceptionConstant.GET_IMMOV_COUNT_ERROR);
+                }
+                if(immovs!=null && immovs.size()>0){
+                    SJ_Info_Immovable immov = immovs.get(0);
+                    immov.setGlObligeeVoList(this.sJInfoManagerMapper.selectQlrGlByInfoId(immov.getInfoId(),"权利人"));
+                    immov.setGlAgentVoList(this.sJInfoManagerMapper.selectQlrGlByInfoId(immov.getInfoId(),"权利代理人"));
+                    immov.setGlImmovableVoList(dealGetBdcGls(immov));
+                    sjsq.setImmovableSelf(immov);
+                }
+                break;
         }
         return sjsq;
     }
@@ -900,5 +1081,285 @@ public class RecieveDataBusinessBizImpl implements RecieveDataBusinessBiz {
             }
         }
         return true;
+    }
+
+    private List<Integer> findSameBdcGlSelf(List<SJ_Bdc_Gl> bdcgls_exist){
+        List<Integer> same_indexs = new ArrayList<Integer>();
+        if(bdcgls_exist!=null && bdcgls_exist.size()>1){
+            for (int i=0;i<bdcgls_exist.size()-1;i++){
+                boolean isContinue = false;
+                SJ_Bdc_Gl bdcgl_index = bdcgls_exist.get(i);
+                SJ_Bdc_Fw_Info fwInfo = null;
+                SJ_Bdc_Zd_Info zdInfo = null;
+                boolean isFd = true;
+                if(bdcgl_index.getImmovableType().equals(BizOrBizExceptionConstant.IMMOVABLE_TYPE_OF_JD)){
+                    isFd = false;
+                }
+                if(isFd){
+                    fwInfo = sJInfoManagerMapper.selectBdcFDByInfoId(bdcgl_index.getImmovableId());
+                }else{
+                    zdInfo = sJInfoManagerMapper.selectBdcJDByInfoId(bdcgl_index.getImmovableId());
+                }
+                for(Integer same_index:same_indexs){
+                    if(i==same_index){
+                        isContinue = true;
+                        break;
+                    }
+                }
+                if(isContinue) continue;
+                for(int j=i+1;j<bdcgls_exist.size();j++){
+                    SJ_Bdc_Gl bdcgl = bdcgls_exist.get(j);
+                    if(isFd){
+                        if(!bdcgl.getImmovableType().equals(BizOrBizExceptionConstant.IMMOVABLE_TYPE_OF_JD)){
+                            if(isSameFD(bdcgl_index,bdcgl)){
+                                same_indexs.add(j);
+                            }
+                        }
+                    } else {
+                        if (bdcgl.getImmovableType().equals(BizOrBizExceptionConstant.IMMOVABLE_TYPE_OF_JD)){
+                            if(isSameJD(bdcgl_index,bdcgl)){
+                                same_indexs.add(j);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return same_indexs;
+    }
+
+    private SJ_Bdc_Gl isCopyBdc(SJ_Bdc_Gl bdcgl,List<SJ_Bdc_Gl> bdcgls_exist){
+//        boolean isSame = false;
+        SJ_Bdc_Gl bdc_gl = null;
+        if(bdcgls_exist!=null && bdcgls_exist.size()>0) {
+            for (SJ_Bdc_Gl bdcgl_exist : bdcgls_exist) {
+                if(bdcgl.getImmovableType().equals(bdcgl_exist.getImmovableType())){//不动产类型需要一致
+                    if(StringUtils.isNotBlank(bdcgl.getRelationId())){
+                        if(bdcgl.getRelationId().equals(bdcgl_exist.getRelationId())) {//待保存的数据存在关系id且重复
+                            bdc_gl = bdcgl_exist;
+                            break;
+                        } else {    //待保存的数据存在关系id且不重复
+                            continue;
+                        }
+                    } else {//待保存的数据不存在关系id
+                        if (bdcgl.getImmovableType().equals(BizOrBizExceptionConstant.IMMOVABLE_TYPE_OF_JD)) {//净地判断重复
+                            if(isSameJD(bdcgl_exist,bdcgl)){
+                                bdc_gl = bdcgl_exist;
+                                break;
+                            }
+                        } else {//房地判断重复
+                            if(isSameFD(bdcgl_exist,bdcgl)){
+                                bdc_gl = bdcgl_exist;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return bdc_gl;
+    }
+
+    private boolean isOutBdcgl(SJ_Bdc_Gl bdcgl_exist,List<SJ_Bdc_Gl> bdcgls){
+        boolean isOut = true;
+        for(SJ_Bdc_Gl bdcgl:bdcgls){
+            if(bdcgl.getImmovableType().equals(bdcgl_exist.getImmovableType())){
+                if(StringUtils.isNotBlank(bdcgl.getRelationId())){
+                    if(bdcgl.getRelationId().equals(bdcgl_exist.getRelationId())){
+                        isOut = false;
+                        break;
+                    }
+                }else{//这种新入关系id为空的情况
+                    if (bdcgl.getImmovableType().equals(BizOrBizExceptionConstant.IMMOVABLE_TYPE_OF_JD)) {//净地判断重复
+                        if(isSameJD(bdcgl_exist,bdcgl)){
+                            isOut = false;
+                            break;
+                        }
+                    } else {//房地判断重复
+                        if(isSameFD(bdcgl_exist,bdcgl)){
+                            isOut = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return isOut;
+    }
+
+    private boolean isSameJD(SJ_Bdc_Gl bdcgl_exist,SJ_Bdc_Gl bdcgl){
+        SJ_Bdc_Zd_Info zd_exist = sJInfoManagerMapper.selectBdcJDByInfoId(bdcgl_exist.getImmovableId());
+        SJ_Bdc_Zd_Info zd = bdcgl.getZdInfo();
+        if(zd==null){
+            zd = sJInfoManagerMapper.selectBdcJDByInfoId(bdcgl.getImmovableId());
+        }
+        if(
+                zd != null &&
+                        zd_exist!=null &&
+                        (StringUtils.isNotBlank(zd_exist.getParcelUnicode()) &&
+                            StringUtils.isNotBlank(zd.getParcelUnicode())&&
+                            zd_exist.getParcelUnicode().equals(zd.getParcelUnicode()) ||
+                                StringUtils.isNotBlank(zd_exist.getImmovableUnitNumber()) &&
+                                        StringUtils.isNotBlank(zd.getImmovableUnitNumber())&&
+                                        zd_exist.getImmovableUnitNumber().equals(zd.getImmovableUnitNumber())
+                        )
+        ){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isSameFD(SJ_Bdc_Gl bdcgl_exist,SJ_Bdc_Gl bdcgl){
+        SJ_Bdc_Fw_Info fw_exist = sJInfoManagerMapper.selectBdcFDByInfoId(bdcgl_exist.getImmovableId());
+        SJ_Bdc_Fw_Info fw = bdcgl.getFwInfo();
+        if(fw==null){
+            fw = sJInfoManagerMapper.selectBdcFDByInfoId(bdcgl.getImmovableId());
+        }
+        if(
+                fw!=null &&
+                        fw_exist!=null &&
+                        (StringUtils.isNotBlank(fw_exist.getHouserUnifiedCode()) &&                                  //不动产统一标识
+                            StringUtils.isNotBlank(fw.getHouserUnifiedCode())&&
+                            fw_exist.getHouserUnifiedCode().equals(fw.getHouserUnifiedCode()) ||
+                                StringUtils.isNotBlank(fw_exist.getHouseholdId()) &&                                        //户编号
+                                StringUtils.isNotBlank(fw.getHouseholdId())&&
+                            fw_exist.getHouseholdId().equals(fw.getHouseholdId()) ||
+                                StringUtils.isNotBlank(fw_exist.getImmovableUnicode()) &&                                   //不动产统一编码
+                                StringUtils.isNotBlank(fw.getImmovableUnicode())&&
+                            fw_exist.getImmovableUnicode().equals(fw.getImmovableUnicode()) ||
+                                StringUtils.isNotBlank(fw_exist.getImmovableUnitNumber()) &&                                //不动产单元号
+                                StringUtils.isNotBlank(fw.getImmovableUnitNumber())&&
+                                fw_exist.getImmovableUnitNumber().equals(fw.getImmovableUnitNumber())
+                        )
+        ){
+            return true;
+        }
+        return false;
+    }
+
+    private Integer deleteImmovExist(SJ_Bdc_Gl bdcgl_exist){
+        Integer count = 0;
+        if(sJInfoManagerMapper.selectNotUseBdcGlCount(bdcgl_exist.getImmovableId(),bdcgl_exist.getImmovableType(),bdcgl_exist.getInfoId())<=0){
+            if(bdcgl_exist.getImmovableType().equals(BizOrBizExceptionConstant.IMMOVABLE_TYPE_OF_JD)) {
+                count = sJInfoManagerMapper.deleteZDById(bdcgl_exist.getImmovableId());
+            } else {
+                count = sJInfoManagerMapper.deleteFWById(bdcgl_exist.getImmovableId());
+            }
+        }
+        return count;
+    }
+
+    private boolean isOutQlrgl(SJ_Qlr_Gl qlrgl_exist,List<SJ_Qlr_Gl> qlrgls){
+        boolean isOut = true;
+        SJ_Qlr_Info qlr_exist = sJInfoManagerMapper.selectObligeeById(qlrgl_exist.getObligeeId());
+        if(qlr_exist!=null) {
+            for (SJ_Qlr_Gl qlrgl : qlrgls) {
+                if (StringUtils.isNotBlank(qlrgl.getRelationId())) {
+                    if (qlrgl.getRelationId().equals(qlrgl_exist.getRelationId())) {
+                        isOut = false;
+                        break;
+                    }
+                } else {
+                    SJ_Qlr_Info qlr = qlrgl.getRelatedPerson();
+                    if (
+                            StringUtils.isNotBlank(qlr.getObligeeDocumentType()) &&
+                                    StringUtils.isNotBlank(qlr_exist.getObligeeDocumentType()) &&
+                                    qlr.getObligeeDocumentType().equals(qlr_exist.getObligeeDocumentType())
+                    ){
+                        if(
+                                qlr.getObligeeName().equals(qlr_exist.getObligeeName()) &&
+                                        qlr.getObligeeDocumentNumber().equals(qlr_exist.getObligeeDocumentNumber())
+                        ){
+                            isOut = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return isOut;
+    }
+
+    private SJ_Qlr_Gl isCopyQlr(SJ_Qlr_Gl qlrgl,List<SJ_Qlr_Gl> qlrgls_exist){
+        SJ_Qlr_Gl sameQlrgl = null;
+        if(qlrgls_exist!=null && qlrgls_exist.size()>0){
+            for(SJ_Qlr_Gl qlrgl_exist:qlrgls_exist){
+                if(StringUtils.isNotBlank(qlrgl.getRelationId())){
+                    if(qlrgl.getRelationId().equals(qlrgl_exist.getRelationId())){
+                        sameQlrgl = qlrgl_exist;
+                        break;
+                    }else{
+                        continue;
+                    }
+                }else{
+                    if(qlrgl.getObligeeName().equals(qlrgl_exist.getObligeeName())){
+                        SJ_Qlr_Info qlr = qlrgl.getRelatedPerson();
+                        SJ_Qlr_Info qlr_exist = sJInfoManagerMapper.selectObligeeById(qlrgl_exist.getObligeeId());
+                        if(StringUtils.isNotBlank(qlr.getObligeeDocumentNumber())){
+                            if(StringUtils.isNotBlank(qlr_exist.getObligeeDocumentNumber()) && qlr.getObligeeDocumentNumber().equals(qlr_exist.getObligeeDocumentNumber())){
+                                sameQlrgl = qlrgl_exist;
+                                break;
+                            }
+                        }else{
+                            if(StringUtils.isBlank(qlr_exist.getObligeeDocumentNumber())){
+                                sameQlrgl = qlrgl_exist;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return sameQlrgl;
+    }
+
+    private List<Integer> findSameQlrGlSelf(List<SJ_Qlr_Gl> qlrgls_exist){
+        List<Integer> same_indexs = new ArrayList<Integer>();
+        if(qlrgls_exist!=null && qlrgls_exist.size()>1){
+            for (int i=0;i<qlrgls_exist.size()-1;i++){
+                boolean isContinue = false;
+                SJ_Qlr_Gl qlrgl_index = qlrgls_exist.get(i);
+                SJ_Qlr_Info qlr_index = sJInfoManagerMapper.selectObligeeById(qlrgl_index.getObligeeId());
+                if(qlr_index==null){
+                    same_indexs.add(i);
+                    isContinue = true;
+                }
+                for(Integer same_index:same_indexs){
+                    if(i==same_index){
+                        isContinue = true;
+                        break;
+                    }
+                }
+                if(isContinue) continue;
+                for(int j=i+1;j<qlrgls_exist.size();j++){
+                    SJ_Qlr_Gl qlrgl = qlrgls_exist.get(j);
+                    if(qlrgl.getObligeeName().equals(qlrgl_index.getObligeeName())){
+                        SJ_Qlr_Info qlr = sJInfoManagerMapper.selectObligeeById(qlrgl.getObligeeId());
+                        if(qlr==null){
+                            if(j==qlrgls_exist.size()-1){
+                                same_indexs.add(j);
+                            }
+                        }else{
+                            if(StringUtils.isNotBlank(qlr_index.getObligeeDocumentNumber())){
+                                if(StringUtils.isNotBlank(qlr.getObligeeDocumentNumber()) && qlr.getObligeeDocumentNumber().equals(qlr_index.getObligeeDocumentNumber())){
+                                    same_indexs.add(j);
+                                }
+                            }else{
+                                if(StringUtils.isBlank(qlr.getObligeeDocumentNumber())){
+                                    same_indexs.add(j);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return same_indexs;
+    }
+
+    private void RemoveExistQlr(SJ_Qlr_Gl qlrgl_exist){
+        if(sJInfoManagerMapper.selectUsedQlrCount(qlrgl_exist.getObligeeId(),qlrgl_exist.getInfoId())<=0){
+            sJInfoManagerMapper.deleteQlrById(qlrgl_exist.getObligeeId());
+        }
     }
 }

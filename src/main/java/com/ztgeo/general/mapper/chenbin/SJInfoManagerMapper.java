@@ -21,6 +21,7 @@ public interface SJInfoManagerMapper {
     public List<Sj_Info_Jyhtxx> selectJyhtxxs(@Param("sqbh") String sqbh, @Param("serviceCode") String serviceCode);
     public List<Sj_Info_Qsxx> selectDsxxs(@Param("sqbh") String sqbh,@Param("serviceCode") String serviceCode);
     public List<SJ_Info_Handle_Result> selectHandleResults(@Param("sqbh") String sqbh,@Param("serviceCode") String serviceCode);
+    List<SJ_Info_Immovable> selectImmovs(@Param("sqbh") String sqbh, @Param("serviceCode") String serviceCode);
     public List<SJ_Qlr_Gl> selectQlrGlByInfoId(@Param("infoId") String infoId,@Param("qlrlx") String qlrlx);
 
     public List<SJ_Bdc_Gl> selectBdcglByInfoId(@Param("infoId") String infoId);
@@ -32,6 +33,7 @@ public interface SJInfoManagerMapper {
     public Sj_Info_Bdcdyxgxx selectBdcdyxxBySjbhAndMortgageNo(@Param("receiptNumber") String receiptNumber,@Param("mortgageCertificateNo") String mortgageCertificateNo,@Param("serviceCode") String serviceCode);
     public Sj_Info_Jyhtxx selectJyhtxxBySqbh(@Param("receiptNumber") String receiptNumber);
     public Sj_Info_Dyhtxx selectDyhtxxBySqbh(@Param("receiptNumber") String receiptNumber);
+    SJ_Info_Immovable selectImmovBySqbh(@Param("receiptNumber") String receiptNumber);
     public Sj_Info_Qsxx selectQsxxBySqbh(@Param("receiptNumber") String receiptNumber,
                                          @Param("serviceCode")String serviceCode,
                                          @Param("xtsphm")String xtsphm,
@@ -56,6 +58,8 @@ public interface SJInfoManagerMapper {
     public Integer updateQsxx(Sj_Info_Qsxx qsxx);
     public Integer insertHandleResult(SJ_Info_Handle_Result handleResult);
     public Integer updateHandleResult(SJ_Info_Handle_Result handleResult);
+    Integer insertImmovable(SJ_Info_Immovable immovable);
+    Integer updateImmovable(SJ_Info_Immovable immovable);
 
     public Integer insertBdcgl(SJ_Bdc_Gl bdcgl);
     public Integer updateBdcgl(SJ_Bdc_Gl bdcgl);
@@ -95,4 +99,10 @@ public interface SJInfoManagerMapper {
     public List<SJ_Execute_depart> selectExeDepart(@RequestParam("receiptNumber") String receiptNumber);
     public Integer insertExeDepart(SJ_Execute_depart depart);
     public Integer updateExeDepart(SJ_Execute_depart depart);
+
+    public Integer deleteBDCGlByInfoId(@Param("infoId")String infoId);
+    public Integer deleteQLRGlByInfoIdAndObligeeType(@Param("infoId")String infoId,@Param("obligeeType")String obligeeType);
+    Integer selectUsedQlrCount(@Param("obligeeId")String obligeeId,@Param("infoId")String infoId);
+    Integer selectNotUseBdcGlCount(@Param("immovableId")String immovableId,@Param("immovableType")String immovableType,@Param("infoId")String infoId);
+    SJ_Qlr_Info selectObligeeById(@Param("obligeeId")String obligeeId);
 }

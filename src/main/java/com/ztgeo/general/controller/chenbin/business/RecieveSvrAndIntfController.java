@@ -12,6 +12,7 @@ import com.ztgeo.general.entity.service_data.pub_data.*;
 import com.ztgeo.general.exception.chenbin.ZtgeoBizException;
 import com.ztgeo.general.util.chenbin.ErrorDealUtil;
 import com.ztgeo.general.util.chenbin.MyMapUtil;
+import com.ztgeo.general.util.chenbin.UserUtil;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.task.Task;
@@ -89,9 +90,12 @@ public class RecieveSvrAndIntfController {
     @RequestMapping(value = "/DealRecieveFromOuter2", method = RequestMethod.POST)
     public ObjectRestResponse<Object> DealRecieveFromOuter2(@RequestBody Map<String,String> sjsq){
         try {
+            System.err.println("操作员："+ UserUtil.checkAndGetUser());
             List<Task> tasks = interfaceRequestHandleComponent.DealRecieveFromOuter2(sjsq);//提交流程
+            System.err.println("提交成功");
             try {
                 workManagerComponent.dealAuto(tasks);
+                System.err.println("接口执行成功");
             } catch (Exception e){
                 e.printStackTrace();
                 log.error("系统异常，异常信息为："+ErrorDealUtil.getErrorInfo(e));

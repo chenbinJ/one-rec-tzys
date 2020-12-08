@@ -1,6 +1,7 @@
 package com.ztgeo.general.entity.service_data.json_data;
 
 import com.ztgeo.general.entity.service_data.pub_data.SJ_Bdc_Gl;
+import com.ztgeo.general.entity.service_data.pub_data.SJ_Qlr_Gl;
 import com.ztgeo.general.util.chenbin.TimeUtil;
 
 import java.io.Serializable;
@@ -16,12 +17,21 @@ public class JSONImmovable implements Serializable {
     private String dataComeFromMode;                //数据获取方式
     private String preservationMan;                 //数据提交人
     private String provideUnit;                     //数据提供单位
+    private String kfqy;
+    private String lpzl;
+    private String xmmc;
+    private String lpmc;
+    private String zh;
     private Date insertTime;                      //入库时间
     private String remarks;
     private String ext1;                            //扩展字段1
     private String ext2;                            //扩展字段2
     private String ext3;                            //扩展字段3
     private String glImmovableVoList;          //关联的不动产数据
+
+    private String glObligeeVoList;            //关联权利人列表
+
+    private String glAgentVoList;               //关联代理人
 
     public String getInfoId() {
         return infoId;
@@ -79,6 +89,46 @@ public class JSONImmovable implements Serializable {
         this.provideUnit = provideUnit;
     }
 
+    public String getKfqy() {
+        return kfqy;
+    }
+
+    public void setKfqy(String kfqy) {
+        this.kfqy = kfqy;
+    }
+
+    public String getLpzl() {
+        return lpzl;
+    }
+
+    public void setLpzl(String lpzl) {
+        this.lpzl = lpzl;
+    }
+
+    public String getXmmc() {
+        return xmmc;
+    }
+
+    public void setXmmc(String xmmc) {
+        this.xmmc = xmmc;
+    }
+
+    public String getLpmc() {
+        return lpmc;
+    }
+
+    public void setLpmc(String lpmc) {
+        this.lpmc = lpmc;
+    }
+
+    public String getZh() {
+        return zh;
+    }
+
+    public void setZh(String zh) {
+        this.zh = zh;
+    }
+
     public Date getInsertTime() {
         return insertTime;
     }
@@ -125,5 +175,21 @@ public class JSONImmovable implements Serializable {
 
     public void setGlImmovableVoList(String glImmovableVoList) {
         this.glImmovableVoList = glImmovableVoList;
+    }
+
+    public String getGlObligeeVoList() {
+        return glObligeeVoList;
+    }
+
+    public void setGlObligeeVoList(String glObligeeVoList) {
+        this.glObligeeVoList = glObligeeVoList;
+    }
+
+    public String getGlAgentVoList() {
+        return glAgentVoList;
+    }
+
+    public void setGlAgentVoList(String glAgentVoList) {
+        this.glAgentVoList = glAgentVoList;
     }
 }

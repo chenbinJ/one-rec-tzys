@@ -50,6 +50,12 @@
     AND step_id = #{stepId} AND permission_level = #{permissionLevel}
   </select>
 
+  <select id="getPositionByStepIdOrQx" resultMap="BaseResultMap">
+    SELECT  *  from sj_power_step_position
+    WHERE  step_id = #{stepId} AND permission_level = #{permissionLevel}
+  </select>
+
+
 
 
    <select id="getPositionByStepId" resultMap="BaseResultMap">

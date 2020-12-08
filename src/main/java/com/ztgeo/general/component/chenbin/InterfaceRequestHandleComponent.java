@@ -23,8 +23,10 @@ import com.ztgeo.general.mapper.chenbin.*;
 import com.ztgeo.general.service.chenbin.InterfaceDataHandleService;
 import com.ztgeo.general.service.chenbin.RecordHandleService;
 import com.ztgeo.general.util.chenbin.*;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 //参数处理component
+@Slf4j
 @Component
 @Transactional(rollbackFor = Exception.class)
 public class InterfaceRequestHandleComponent {
@@ -146,6 +149,7 @@ public class InterfaceRequestHandleComponent {
             if(StringUtils.isBlank(taskId)){
                 throw new ZtgeoBizException("接口调用必要参数传入异常");
             }
+            System.err.println("执行自动接口："+intf.getInterfaceName());
             stepId = (String) stepComponent.getSteps(taskId);
             //验证步骤-接口权限是否成立，待开发（查询出来就行）
             SJ_Power_Step_Interface stepIntf = stepManagerMapper.selectStepIntfByThemId(stepId,intfId);
@@ -176,11 +180,11 @@ public class InterfaceRequestHandleComponent {
                 }
             }
         }
-        System.out.println("此次参数为："+ JSONObject.toJSONString(httpParams));
+        System.err.println("此次参数为："+ JSONObject.toJSONString(httpParams));
         //设置接口头
         Map<String,String> header = new HashMap<String,String>();
         String httpResp = HttpClientUtil.sendHttp(MyHttpUtil.getRequestMethod(intf.getReqMethod()),intf.getContentType(),intf.getInterfaceURL(),httpParams,header);
-        System.out.println("返回结果为："+httpResp);
+        System.err.println("返回结果为："+httpResp);
         //返回值处理
         JSONObject object = JSONObject.parseObject(httpResp);
         if(object.getInteger("status")==200){
@@ -253,6 +257,7 @@ public class InterfaceRequestHandleComponent {
             String msg = StringUtils.isNotBlank((String)object.get("data"))?(String)object.get("data"):(String)object.get("message");
             throw new ZtgeoBizException(StringUtils.isNotBlank(msg)?msg:"接口请求执行异常");
         }
+        System.out.println("本次接口处理返回值为："+JSONObject.toJSONString(rv_obj));
         return rv_obj;
     }
 
@@ -267,6 +272,7 @@ public class InterfaceRequestHandleComponent {
         JSONReceiptData sjsq_JSON_str = JSON.parseObject(obj,JSONReceiptData.class);//json转实体类(SJSQ)
         String slbh = sjsq_JSON_str.getRegisterNumber();
         if(StringUtils.isBlank(sjsq_JSON_str.getReceiptNumber())) {
+            log.error("本次受理编号为："+slbh);
             sjsq_JSON_str.setReceiptNumber(getReceiptNumber(slbh));
         }
         //签收办件
@@ -305,6 +311,9 @@ public class InterfaceRequestHandleComponent {
         if (StringUtils.isNotBlank(executeDeparts) && saveResult.isSuccess()){
             List<SJ_Execute_depart> execute_departs=(List<SJ_Execute_depart>) JSONArray.toCollection(JSONArray.fromObject(executeDeparts),SJ_Execute_depart.class);
            tasks = workManagerComponent.AutoSdq(saveResult.getParams().getApproveTaskId(),saveResult.getParams().getApproveProcessinstanceid(),execute_departs);
+           for(Task task:tasks){
+
+           }
         }else if (saveResult.isSuccess()){
         //先进行数据保存
 //        (saveResult.isSuccess()) {

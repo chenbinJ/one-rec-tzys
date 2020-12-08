@@ -1,6 +1,7 @@
 package com.ztgeo.general.component.penghao;
 
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxiaoqi.security.common.msg.ObjectRestResponse;
 import com.github.wxiaoqi.security.common.util.BooleanUtil;
@@ -276,7 +277,7 @@ public class ApproveComponent {
                 userTask.setAssignee(username);
         }
         //设置签收人
-        if (userTask.getAssignee().equals(username)){
+        if (StringUtils.isBlank(userTask.getAssignee())||userTask.getAssignee().equals(username)){
             userTask.setAssignee(username);
         }
         //查询task对应approve
@@ -511,6 +512,7 @@ public class ApproveComponent {
         //自动接口只可以有一个
         if (sjPowerStepInterface.size()==1){
             SJ_Interface intf = intfManagerMapper.selectIntfById(sjPowerStepInterface.get(0).getInterfaceId());
+            System.err.println("intf为："+ JSONObject.toJSONString(intf));
             //参数必须有一个
             if (intf.getParamVoList().size()==1){
                 //通过taskId 调用sjsq收件申请

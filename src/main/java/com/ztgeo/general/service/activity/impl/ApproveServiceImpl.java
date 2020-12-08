@@ -19,6 +19,7 @@ import com.ztgeo.general.component.penghao.StepComponent;
 import com.ztgeo.general.component.pubComponent.ReceiptNumberComponent;
 import com.ztgeo.general.constant.chenbin.BizOrBizExceptionConstant;
 import com.ztgeo.general.entity.Depart;
+import com.ztgeo.general.entity.Position;
 import com.ztgeo.general.entity.User;
 import com.ztgeo.general.entity.activity.Approve;
 import com.ztgeo.general.entity.activity.HistoryPojo;
@@ -28,10 +29,12 @@ import com.ztgeo.general.entity.extend.Temporary;
 import com.ztgeo.general.entity.service_data.pub_data.*;
 import com.ztgeo.general.exception.chenbin.ZtgeoBizException;
 import com.ztgeo.general.exceptionmsg.MsgManager;
+import com.ztgeo.general.mapper.PositionUserMapper;
 import com.ztgeo.general.mapper.UserMapper;
 import com.ztgeo.general.mapper.activity.ApproveMapper;
 import com.ztgeo.general.mapper.chenbin.StepManagerMapper;
 import com.ztgeo.general.mapper.penghao.DepartUserMapper;
+import com.ztgeo.general.mapper.penghao.SjPowerStepPositionMapper;
 import com.ztgeo.general.mapper.penghao.TemplateCategoryMapper;
 import com.ztgeo.general.service.activity.ActivityService;
 import com.ztgeo.general.service.activity.ApproveService;
@@ -111,6 +114,10 @@ public class ApproveServiceImpl implements ApproveService {
     private ExceptionRecordBiz exceptionRecordBiz;
     @Autowired
     private OtherComponent otherComponent;
+    @Autowired
+    private SjPowerStepPositionMapper sjPowerStepPositionMapper;
+    @Autowired
+    private PositionUserMapper positionUserMapper;
 
 
     @Override
@@ -157,8 +164,22 @@ public class ApproveServiceImpl implements ApproveService {
                     rv.data(ywcApprove.get(0));
                     return rv;
                 }
-                if (null == historicTaskInstance.getEndTime() && !historicTaskInstance.getAssignee().equals(UserUtil.checkAndGetUser())) {
-                    throw new ZtgeoBizException(MsgManager.TASK_PERSON);
+                //查询是否含有只读权限
+                SJ_Act_Step act_step=stepManagerMapper.selectStepByMouldId(historicTaskInstance.getTaskDefinitionKey());
+                log.info("aaaaaaaa");
+                List<SJ_Power_Step_Position> positionList=sjPowerStepPositionMapper.getPositionByStepIdOrQx(act_step.getStepId(),BizOrBizExceptionConstant.POWER_LEVEL_READ);
+                if (positionList.size() != 0) {
+                    log.info("v");
+                    List<Position> positions = positionUserMapper.selectPositionByUid(UserUtil.getUerId());
+                    for (SJ_Power_Step_Position stepPosition : positionList) {
+                        for (Position position : positions) {
+                            //判断是否相同  相同会有只读权限
+                            if (stepPosition.getPositionId().equals(position.getId())) {
+                                rv.data(approve);
+                                return  rv;
+                            }
+                        }
+                    }
                 }
                 if (null != historicTaskInstance.getAssignee() && null != historicTaskInstance.getEndTime()) {
                     //分割字符串进行判断
@@ -188,6 +209,21 @@ public class ApproveServiceImpl implements ApproveService {
                 approve.setPermission(BizOrBizExceptionConstant.POWER_LEVEL_WRITE);
                 return rv.data(approve);
             }
+            //查询是否含有只读权限
+            SJ_Act_Step act_step=stepManagerMapper.selectStepByMouldId(task.getTaskDefinitionKey());
+            List<SJ_Power_Step_Position> positionList=sjPowerStepPositionMapper.getPositionByStepIdOrQx(act_step.getStepId(),BizOrBizExceptionConstant.POWER_LEVEL_READ);
+            if (positionList.size() != 0) {
+                List<Position> positions = positionUserMapper.selectPositionByUid(UserUtil.getUerId());
+                for (SJ_Power_Step_Position stepPosition : positionList) {
+                    for (Position position : positions) {
+                        //判断是否相同  相同会有只读权限
+                        if (stepPosition.getPositionId().equals(position.getId())) {
+                            rv.data(approve);
+                            return  rv;
+                        }
+                    }
+                }
+            }
         }
         throw new ZtgeoBizException(MsgManager.USER_FLOW_QXNULL);
     }
@@ -213,18 +249,20 @@ public class ApproveServiceImpl implements ApproveService {
         if (taskCompletes != null && taskCompletes.size() > 0) {
             Map<String, Object> zdMap = new HashMap<>();
             for (Task taskCompleteObj : taskCompletes) {
-                try {
-                    zdMap = approveComponent.getActivityAutoInterface(taskCompleteObj.getId(), new HashMap<String, String>());
-                    rvv.put(taskCompleteObj.getId(), zdMap);
-                    if (zdMap == null) {
-                        log.info("主键为：" + taskCompleteObj.getId() + "的任务暂无可执行的自动接口");
+                if(org.apache.commons.lang3.StringUtils.isBlank(taskCompleteObj.getAssignee())) {//未签收的任务
+                    try {
+                        zdMap = approveComponent.getActivityAutoInterface(taskCompleteObj.getId(), new HashMap<String, String>());
+                        rvv.put(taskCompleteObj.getId(), zdMap);
+                        if (zdMap == null) {
+                            log.info("主键为：" + taskCompleteObj.getId() + "的任务暂无可执行的自动接口");
+                        }
+                    } catch (ZtgeoBizException e) {
+                        log.error(ErrorDealUtil.getErrorInfo(e));
+                        doExcAdd(taskCompleteObj.getId(), e.getMessage());//写入异常表
+                    } catch (Exception e) {
+                        log.error(ErrorDealUtil.getErrorInfo(e));
+                        doExcAdd(taskCompleteObj.getId(), e.getMessage());//写入异常表
                     }
-                } catch (ZtgeoBizException e) {
-                    log.error(ErrorDealUtil.getErrorInfo(e));
-                    doExcAdd(taskCompleteObj.getId(), e.getMessage());//写入异常表
-                } catch (Exception e) {
-                    log.error(ErrorDealUtil.getErrorInfo(e));
-                    doExcAdd(taskCompleteObj.getId(), e.getMessage());//写入异常表
                 }
             }
         }
@@ -670,7 +708,10 @@ public class ApproveServiceImpl implements ApproveService {
         }
         PageHelper.startPage(Integer.parseInt(page),
                 Integer.parseInt(rows));//分页条件
-        List<Approve> approveList = approveMapper.getUnfinishedProcess(approveType, MsgManager.END, UserUtil.checkAndGetUser(), stringList);
+        List<Approve> approveList = new ArrayList<Approve>();
+        if(stringList!=null && stringList.size()>0) {
+            approveList = approveMapper.getUnfinishedProcess(approveType, MsgManager.END, UserUtil.checkAndGetUser(), stringList);
+        }
         PageInfo<Approve> pageInfo = new PageInfo<Approve>(approveList);
         return new DataGridResult(pageInfo.getTotal(), pageInfo.getList());
     }
@@ -746,6 +787,7 @@ public class ApproveServiceImpl implements ApproveService {
         if (list != null && list.size() != 0) {
             for (String modelId : list) {
                 Model model = repositoryService.createModelQuery().modelId(modelId).singleResult();
+                System.err.println("modelId:"+modelId);
                 if (!StringUtils.isEmpty(model.getDeploymentId())) {
                     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().deploymentId(model.getDeploymentId());//
                     if (query == null) {
