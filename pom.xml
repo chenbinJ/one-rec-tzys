@@ -100,7 +100,7 @@
             <!--itext的主要包-->
             <groupId>com.itextpdf</groupId>
             <artifactId>itextpdf</artifactId>
-            <version>5.5.10</version>
+            <version>5.5.12</version>
         </dependency>
         <!--itext的字体包 用于支持中文-->
         <dependency>
